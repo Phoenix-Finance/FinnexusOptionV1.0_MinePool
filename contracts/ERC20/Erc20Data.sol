@@ -1,5 +1,5 @@
 pragma solidity =0.5.16;
-import "../modules/Ownable.sol";
+import "../modules/Managerable.sol";
 contract Erc20Data is Ownable{
     string public name;
     string public symbol;
