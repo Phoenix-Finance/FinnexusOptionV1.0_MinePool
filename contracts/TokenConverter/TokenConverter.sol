@@ -49,10 +49,9 @@ contract TokenConverter is TokenConverterData {
     function lockedBalanceOf(address account) public view returns (uint256) {
         return lockedBalances[account];
     }
-    
 
 
-    function inputCfnxAndDispatch(address account,uint256 amount) external onlyManager {
+    function inputCfnxForInstalmentPay(address account,uint256 amount) external onlyManager {
         require(account != address(0));
         require(amount>0);
         
@@ -82,15 +81,15 @@ contract TokenConverter is TokenConverterData {
     }
     
     
-    function claimFnxReward() public {
+    function claimFnxExpiredReward() public {
         uint256 txcnt = 0;
         uint256 i = lockedIndexs[tx.origin].beginIdx;
         uint256 endIdx = lockedIndexs[tx.origin].totalIdx;
         uint256 totalRet = 0;
         
-        for(;i<endIdx&&txcnt<txNum;i++) {
+        for(;i<endIdx && txcnt<txNum;i++) {
 
-            if (now > lockedAllRewards[tx.origin][i].startTime + lockPeriod) {
+            if (now >= lockedAllRewards[tx.origin][i].startTime + lockPeriod) {
                 totalRet = totalRet.add(lockedAllRewards[tx.origin][i].alloc[0]);
                 lockedAllRewards[tx.origin][i].alloc[0] = 0;
                 
@@ -104,9 +103,13 @@ contract TokenConverter is TokenConverterData {
                     subtotal = subtotal.add(lockedAllRewards[tx.origin][i].alloc[j]);
                     lockedAllRewards[tx.origin][i].alloc[j] = 0;
                 }
+                
+                //updated left locked balance
                 lockedAllRewards[tx.origin][i].alloc[0] = lockedAllRewards[tx.origin][i].alloc[0].sub(subtotal);
                 totalRet = totalRet.add(subtotal);
             }
+            
+            txcnt = txcnt + 1;
         }
         
         lockedBalances[tx.origin] = lockedBalances[tx.origin].sub(totalRet);

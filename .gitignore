@@ -5,3 +5,4 @@ networks/*
 yarn-error.log
 .envrc
 truffle-config.js
+TokenConverter/artifacts*
