@@ -29,7 +29,7 @@ contract TokenConverter is TokenConverterData {
             dispatchTimes = _dispatchTimes;
         
         if (_txNum != 0) 
-            txNum = _txNum;    
+            txNum = _txNum;   
         
     }
     
