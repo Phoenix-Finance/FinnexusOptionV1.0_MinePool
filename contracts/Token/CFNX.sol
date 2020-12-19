@@ -16,7 +16,7 @@ contract CFNX is Ownable, ERC20{
     /// FinNexus total tokens supply
     uint public MAX_TOTAL_TOKEN_AMOUNT = 500000000 ether;
 
-    modifier maxWanTokenAmountNotReached (uint amount){
+    modifier maxTokenAmountNotReached (uint amount){
     	  assert(totalSupply().add(amount) <= MAX_TOTAL_TOKEN_AMOUNT);
     	  _;
     }
@@ -55,10 +55,22 @@ contract CFNX is Ownable, ERC20{
     function mint(address account, uint256 amount)
         public
         onlyOwner
-        maxWanTokenAmountNotReached(amount)
+        maxTokenAmountNotReached(amount)
     {
         _mint(account,amount);
     }
 
-
+    function initialize(uint256 pmaxSupply,string memory pname, string memory psymbol)
+         public
+         onlyOwner
+    {
+            require(pmaxSupply != 0 );
+            MAX_TOTAL_TOKEN_AMOUNT = pmaxSupply;
+            
+            if (bytes(pname).length != 0)
+                _name = pname;
+            
+            if (bytes(psymbol).length != 0)    
+                _symbol = psymbol;
+    }
 }

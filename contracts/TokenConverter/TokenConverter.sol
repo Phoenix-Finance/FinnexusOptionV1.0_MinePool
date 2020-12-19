@@ -51,21 +51,21 @@ contract TokenConverter is TokenConverterData {
     }
 
 
-    function inputCfnxForInstalmentPay(address account,uint256 amount) external onlyManager {
+    function inputCfnxForInstallmentPay(address account,uint256 amount) external onlyManager {
         require(account != address(0));
         require(amount>0);
         
         IERC20(cfnxAddress).transferFrom(account,address(this),amount);
         uint256 idx = lockedIndexs[account].totalIdx;
-        uint256 divAmount = (amount/dispatchTimes);
+        uint256 divAmount = amount.div(dispatchTimes);
 
         lockedAllRewards[account][idx] = lockedReward(now,amount);
         
         //index 0 to save the left token num
         lockedAllRewards[account][idx].alloc[0] = amount.sub(divAmount);
-        uint256 i=1;
-        //idx = 0, the reward give user immediately
-        for(;i<dispatchTimes-1;i++){
+        uint256 i=2;
+        //idx = 1, the reward give user immediately
+        for(;i<dispatchTimes;i++){
             lockedAllRewards[account][idx].alloc[i] = divAmount;
         }
         lockedAllRewards[account][idx].alloc[i] = amount.sub(divAmount.mul(dispatchTimes-1));
@@ -96,10 +96,10 @@ contract TokenConverter is TokenConverterData {
                 //updated last expired idx
                 lockedIndexs[tx.origin].beginIdx = i;
             } else {
-                uint256 timeIdx = (now - lockedAllRewards[tx.origin][i].startTime)/timeSpan;
-                uint256 j = 1;
+                uint256 timeIdx = (now - lockedAllRewards[tx.origin][i].startTime)/timeSpan + 1;
+                uint256 j = 2;
                 uint256 subtotal = 0;
-                for(;j>0&&j<timeIdx+1;j++) {
+                for(;j<timeIdx+1;j++) {
                     subtotal = subtotal.add(lockedAllRewards[tx.origin][i].alloc[j]);
                     lockedAllRewards[tx.origin][i].alloc[j] = 0;
                 }
