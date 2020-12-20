@@ -88,28 +88,36 @@ contract TokenConverter is TokenConverterData {
         uint256 totalRet = 0;
         
         for(;i<endIdx && txcnt<txNum;i++) {
-
-            if (now >= lockedAllRewards[tx.origin][i].startTime + lockPeriod) {
-                totalRet = totalRet.add(lockedAllRewards[tx.origin][i].alloc[0]);
-                lockedAllRewards[tx.origin][i].alloc[0] = 0;
-                
-                //updated last expired idx
-                lockedIndexs[tx.origin].beginIdx = i;
-            } else {
-                uint256 timeIdx = (now - lockedAllRewards[tx.origin][i].startTime)/timeSpan + 1;
-                uint256 j = 2;
-                uint256 subtotal = 0;
-                for(;j<timeIdx+1;j++) {
-                    subtotal = subtotal.add(lockedAllRewards[tx.origin][i].alloc[j]);
-                    lockedAllRewards[tx.origin][i].alloc[j] = 0;
+            
+           if (now >= lockedAllRewards[tx.origin][i].startTime + timeSpan) {
+               
+                if (now >= lockedAllRewards[tx.origin][i].startTime + lockPeriod) {
+                    totalRet = totalRet.add(lockedAllRewards[tx.origin][i].alloc[0]);
+                    lockedAllRewards[tx.origin][i].alloc[0] = 0;
+                    
+                    //updated last expired idx
+                    lockedIndexs[tx.origin].beginIdx = i;
+                } else {
+                  
+                    uint256 timeIdx = (now - lockedAllRewards[tx.origin][i].startTime).div(timeSpan) + 1;
+                    uint256 j = 2;
+                    uint256 subtotal = 0;
+                    for(;j<timeIdx+1;j++) {
+                        subtotal = subtotal.add(lockedAllRewards[tx.origin][i].alloc[j]);
+                        lockedAllRewards[tx.origin][i].alloc[j] = 0;
+                    }
+                    
+                    //updated left locked balance
+                    lockedAllRewards[tx.origin][i].alloc[0] = lockedAllRewards[tx.origin][i].alloc[0].sub(subtotal);
+                    totalRet = totalRet.add(subtotal);
                 }
                 
-                //updated left locked balance
-                lockedAllRewards[tx.origin][i].alloc[0] = lockedAllRewards[tx.origin][i].alloc[0].sub(subtotal);
-                totalRet = totalRet.add(subtotal);
-            }
-            
-            txcnt = txcnt + 1;
+                txcnt = txcnt + 1;
+                
+           } else {
+               //the item after this one is pushed behind this,not needed to caculate
+               break;
+           }
         }
         
         lockedBalances[tx.origin] = lockedBalances[tx.origin].sub(totalRet);
