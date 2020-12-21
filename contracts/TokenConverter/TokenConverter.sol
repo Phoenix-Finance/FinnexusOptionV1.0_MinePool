@@ -82,7 +82,7 @@ contract TokenConverter is TokenConverterData {
         //should can not be overflow
         lockedIndexs[tx.origin].totalIdx =  lockedIndexs[tx.origin].totalIdx + 1;
         
-        IERC20(cfnxAddress).transfer(tx.origin,divAmount);
+        IERC20(fnxAddress).transfer(tx.origin,divAmount);
         
     }
     
