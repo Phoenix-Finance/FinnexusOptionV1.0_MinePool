@@ -58,7 +58,7 @@ contract TokenConverter is TokenConverterData {
     }
 
 
-    function inputCfnxForInstallmentPay(address account,uint256 amount) external onlyManager {
+    function inputCfnxForInstallmentPay(address account,uint256 amount) external {
         require(account != address(0));
         require(amount>0);
         
