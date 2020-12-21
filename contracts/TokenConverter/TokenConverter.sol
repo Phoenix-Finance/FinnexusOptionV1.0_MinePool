@@ -12,10 +12,17 @@ import "../ERC20/IERC20.sol";
 contract TokenConverter is TokenConverterData {
     using SafeMath for uint256;
     
+    function initialize() onlyOwner public {
+        
+    }
+    
+    function update() onlyOwner public{
+    }
+    
     /**
      * @dev constructor function. set FNX minePool contract address. 
      */ 
-    function initialize(address _cfnxAddress,address _fnxAddress,uint256 _timeSpan,uint256 _dispatchTimes,uint256 _txNum) onlyOwner public{
+    function setParameter(address _cfnxAddress,address _fnxAddress,uint256 _timeSpan,uint256 _dispatchTimes,uint256 _txNum) onlyOwner public{
         if (_cfnxAddress != address(0))
             cfnxAddress = _cfnxAddress;
             
@@ -81,7 +88,7 @@ contract TokenConverter is TokenConverterData {
     }
     
     
-    function claimFnxExpiredReward() public {
+    function claimFnxExpiredReward() external {
         uint256 txcnt = 0;
         uint256 i = lockedIndexs[tx.origin].beginIdx;
         uint256 endIdx = lockedIndexs[tx.origin].totalIdx;

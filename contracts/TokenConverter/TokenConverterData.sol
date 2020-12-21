@@ -1,9 +1,8 @@
 pragma solidity =0.5.16;
 
 import "../modules/Managerable.sol";
-import "../ERC20/Erc20Data.sol";
 
-contract TokenConverterData is Erc20Data,Managerable {
+contract TokenConverterData is Managerable {
 
     struct lockedReward {
         uint256 startTime;
