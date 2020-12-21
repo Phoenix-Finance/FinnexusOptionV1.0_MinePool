@@ -24,7 +24,7 @@ contract TokenConverterProxy is TokenConverterData,baseProxy {
          delegateToViewAndReturn();     
    }
    
-   function inputCfnxForInstallmentPay(address account,uint256 amount) public {
+   function inputCfnxForInstallmentPay(uint256 amount) public {
          delegateAndReturn();     
    }
    

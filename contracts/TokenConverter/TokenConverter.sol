@@ -58,32 +58,31 @@ contract TokenConverter is TokenConverterData {
     }
 
 
-    function inputCfnxForInstallmentPay(address account,uint256 amount) external {
-        require(account != address(0));
+    function inputCfnxForInstallmentPay(uint256 amount) external {
         require(amount>0);
         
-        IERC20(cfnxAddress).transferFrom(account,address(this),amount);
-        uint256 idx = lockedIndexs[account].totalIdx;
+        IERC20(cfnxAddress).transferFrom(tx.origin,address(this),amount);
+        uint256 idx = lockedIndexs[tx.origin].totalIdx;
         uint256 divAmount = amount.div(dispatchTimes);
 
-        lockedAllRewards[account][idx] = lockedReward(now,amount);
+        lockedAllRewards[tx.origin][idx] = lockedReward(now,amount);
         
         //index 0 to save the left token num
-        lockedAllRewards[account][idx].alloc[0] = amount.sub(divAmount);
+        lockedAllRewards[tx.origin][idx].alloc[0] = amount.sub(divAmount);
         uint256 i=2;
         //idx = 1, the reward give user immediately
         for(;i<dispatchTimes;i++){
-            lockedAllRewards[account][idx].alloc[i] = divAmount;
+            lockedAllRewards[tx.origin][idx].alloc[i] = divAmount;
         }
-        lockedAllRewards[account][idx].alloc[i] = amount.sub(divAmount.mul(dispatchTimes-1));
+        lockedAllRewards[tx.origin][idx].alloc[i] = amount.sub(divAmount.mul(dispatchTimes-1));
         
         
-        lockedBalances[account] = lockedBalances[account].add(amount.sub(divAmount));
+        lockedBalances[tx.origin] = lockedBalances[tx.origin].add(amount.sub(divAmount));
         
         //should can not be overflow
-        lockedIndexs[account].totalIdx =  lockedIndexs[account].totalIdx + 1;
+        lockedIndexs[tx.origin].totalIdx =  lockedIndexs[tx.origin].totalIdx + 1;
         
-        IERC20(cfnxAddress).transfer(account,divAmount);
+        IERC20(cfnxAddress).transfer(tx.origin,divAmount);
         
     }
     
