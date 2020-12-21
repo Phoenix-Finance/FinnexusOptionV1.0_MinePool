@@ -16,7 +16,7 @@ contract TokenConverterProxy is TokenConverterData,baseProxy {
         delegateAndReturn();
     }
     
-   function setParameter(address _cfnxAddress,address _fnxAddress,uint256 _timeSpan,uint256 _dispatchTimes,uint256 _txNum) public  {
+   function resetParameter(address _cfnxAddress,address _fnxAddress,uint256 _timeSpan,uint256 _dispatchTimes,uint256 _txNum) public  {
         delegateAndReturn();
    }
    
