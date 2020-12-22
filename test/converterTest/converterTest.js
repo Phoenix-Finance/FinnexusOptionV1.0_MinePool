@@ -1,3 +1,6 @@
+const { time, expectEvent} = require("@openzeppelin/test-helpers")
+let utils = require('./utils.js');
+
 let CFNC = artifacts.require("CFNX");
 let TokenConverter = artifacts.require("TokenConverter");
 let TokenConverterProxy = artifacts.require("TokenConverterProxy");
@@ -5,7 +8,9 @@ let TokenConverterProxy = artifacts.require("TokenConverterProxy");
 const BN = require("bn.js");
 const assert = require('assert');
 
-
+const ONE_HOUR = 60*60;
+const ONE_DAY = ONE_HOUR * 24;
+const ONE_MONTH = 30 * ONE_DAY;
 
 contract('TokenConverter', function (accounts) {
     let cfnxAmount1 = new BN("60000000000000000000");
@@ -79,12 +84,86 @@ contract('TokenConverter', function (accounts) {
 
         let diffFNXUser = web3.utils.fromWei(new BN(afterFnxUser)) - web3.utils.fromWei(new BN(beforeFnxUser));
         console.log("FNX diff user:" + diffFNXUser);
+        assert.equal(diffFNXUser,diffContract/6);
 
+        let lockedBalance = await CvntProxyInst.lockedBalanceOf(accounts[1]);
+        console.log(lockedBalance);
+        assert.equal(web3.utils.fromWei(lockedBalance),web3.utils.fromWei(cfnxAmount1)*5/6);
     })
 
     it('Get FNX 2/6 part', async function () {
+        await time.increase(ONE_MONTH + 1);
+        let beforeFnxUser =  await FNXInst.balanceOf(accounts[1]);
+        let tx = await CvntProxyInst.claimFnxExpiredReward({from:accounts[1]});
+        assert.equal(tx.receipt.status,true);
+        await utils.sleep(1000);
+        let afterFnxUser =  await FNXInst.balanceOf(accounts[1]);
+        let diffFNXUser = web3.utils.fromWei(new BN(afterFnxUser)) - web3.utils.fromWei(new BN(beforeFnxUser));
+        console.log("2/6 FNX diff user:" + diffFNXUser);
+        assert.equal(diffFNXUser,web3.utils.fromWei(cfnxAmount1)/6);
 
+        let lockedBalance = await CvntProxyInst.lockedBalanceOf(accounts[1]);
+        assert.equal(web3.utils.fromWei(lockedBalance),web3.utils.fromWei(cfnxAmount1)*4/6);
     })
 
+    it('Get FNX 3/6 part', async function () {
+        await time.increase(ONE_MONTH + 1);
+        let beforeFnxUser =  await FNXInst.balanceOf(accounts[1]);
+        let tx = await CvntProxyInst.claimFnxExpiredReward({from:accounts[1]});
+        assert.equal(tx.receipt.status,true);
+        await utils.sleep(1000);
+        let afterFnxUser =  await FNXInst.balanceOf(accounts[1]);
+        let diffFNXUser = web3.utils.fromWei(new BN(afterFnxUser)) - web3.utils.fromWei(new BN(beforeFnxUser));
+        console.log("3/6 FNX diff user:" + diffFNXUser);
+        assert.equal(diffFNXUser,web3.utils.fromWei(cfnxAmount1)/6);
+
+        let lockedBalance = await CvntProxyInst.lockedBalanceOf(accounts[1]);
+        assert.equal(web3.utils.fromWei(lockedBalance),web3.utils.fromWei(cfnxAmount1)*3/6);
+    })
+
+    it('Get FNX 4/6 part', async function () {
+        await time.increase(ONE_MONTH + 1);
+        let beforeFnxUser =  await FNXInst.balanceOf(accounts[1]);
+        let tx = await CvntProxyInst.claimFnxExpiredReward({from:accounts[1]});
+        assert.equal(tx.receipt.status,true);
+        await utils.sleep(1000);
+        let afterFnxUser =  await FNXInst.balanceOf(accounts[1]);
+        let diffFNXUser = web3.utils.fromWei(new BN(afterFnxUser)) - web3.utils.fromWei(new BN(beforeFnxUser));
+        console.log("4/6 FNX diff user:" + diffFNXUser);
+        assert.equal(diffFNXUser,web3.utils.fromWei(cfnxAmount1)/6);
+
+        let lockedBalance = await CvntProxyInst.lockedBalanceOf(accounts[1]);
+        assert.equal(web3.utils.fromWei(lockedBalance),web3.utils.fromWei(cfnxAmount1)*2/6);
+    })
+
+    it('Get FNX 5/6 part', async function () {
+        await time.increase(ONE_MONTH + 1);
+        let beforeFnxUser =  await FNXInst.balanceOf(accounts[1]);
+        let tx = await CvntProxyInst.claimFnxExpiredReward({from:accounts[1]});
+        assert.equal(tx.receipt.status,true);
+        await utils.sleep(1000);
+        let afterFnxUser =  await FNXInst.balanceOf(accounts[1]);
+        let diffFNXUser = web3.utils.fromWei(new BN(afterFnxUser)) - web3.utils.fromWei(new BN(beforeFnxUser));
+        console.log("5/6 FNX diff user:" + diffFNXUser);
+        assert.equal(diffFNXUser,web3.utils.fromWei(cfnxAmount1)/6);
+
+        let lockedBalance = await CvntProxyInst.lockedBalanceOf(accounts[1]);
+        assert.equal(web3.utils.fromWei(lockedBalance),web3.utils.fromWei(cfnxAmount1)*1/6);
+    })
+
+    it('Get FNX 6/6 part', async function () {
+        await time.increase(ONE_MONTH + 1);
+        let beforeFnxUser =  await FNXInst.balanceOf(accounts[1]);
+        let tx = await CvntProxyInst.claimFnxExpiredReward({from:accounts[1]});
+        assert.equal(tx.receipt.status,true);
+        await utils.sleep(1000);
+        let afterFnxUser =  await FNXInst.balanceOf(accounts[1]);
+        let diffFNXUser = web3.utils.fromWei(new BN(afterFnxUser)) - web3.utils.fromWei(new BN(beforeFnxUser));
+        console.log("6/6 FNX diff user:" + diffFNXUser);
+        assert.equal(diffFNXUser,web3.utils.fromWei(cfnxAmount1)/6);
+
+        let lockedBalance = await CvntProxyInst.lockedBalanceOf(accounts[1]);
+        assert.equal(web3.utils.fromWei(lockedBalance),0);
+    })
 
 })
