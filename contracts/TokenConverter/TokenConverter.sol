@@ -129,7 +129,7 @@ contract TokenConverter is TokenConverterData {
         
         lockedBalances[tx.origin] = lockedBalances[tx.origin].sub(totalRet);
         //transfer back to user
-        IERC20(cfnxAddress).transfer(tx.origin,totalRet);
+        IERC20(fnxAddress).transfer(tx.origin,totalRet);
     }
     
 }
