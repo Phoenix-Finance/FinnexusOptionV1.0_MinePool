@@ -4,6 +4,7 @@ import "../modules/Managerable.sol";
 
 contract AirDropVaultData is Managerable {
 
+
     address public optionColPool;
     address public minePool;
     address public fnxToken;

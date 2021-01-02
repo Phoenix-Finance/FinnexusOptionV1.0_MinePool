@@ -11,7 +11,11 @@ import "../ERC20/IERC20.sol";
  */
 contract TokenConverter is TokenConverterData {
     using SafeMath for uint256;
-    
+    modifier inited (){
+    	  require(cfnxAddress!=address(0));
+    	  require(fnxAddress!=address(0));
+    	  _;
+    } 
 
     function initialize() onlyOwner public {
         
@@ -59,7 +63,7 @@ contract TokenConverter is TokenConverterData {
     }
 
 
-    function inputCfnxForInstallmentPay(uint256 amount) external {
+    function inputCfnxForInstallmentPay(uint256 amount) external inited {
         require(amount>0);
         
         IERC20(cfnxAddress).transferFrom(tx.origin,address(this),amount);
@@ -88,7 +92,9 @@ contract TokenConverter is TokenConverterData {
     }
     
     
-    function claimFnxExpiredReward() external {
+    function claimFnxExpiredReward() external inited {
+        require(fnxAddress!=address(0));
+        
         uint256 txcnt = 0;
         uint256 i = lockedIndexs[tx.origin].beginIdx;
         uint256 endIdx = lockedIndexs[tx.origin].totalIdx;
