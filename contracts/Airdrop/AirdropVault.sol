@@ -71,8 +71,10 @@ contract AirDropVault is AirDropVaultData {
     
     function claim() external {
         require(airDropWhiteList[tx.origin]>0);
+        uint256 amount = airDropWhiteList[tx.origin];
+        airDropWhiteList[tx.origin] = 0;
         uint256 prefptb = IERC20(ftpbToken).balanceOf(address(this));
-        IOptionMgrPoxy(optionColPool).addCollateral(fnxToken,airDropWhiteList[tx.origin]);
+        IOptionMgrPoxy(optionColPool).addCollateral(fnxToken,amount);
         uint256 afterftpb = IERC20(ftpbToken).balanceOf(address(this));
         uint256 ftpbnum = afterftpb.sub(prefptb);
         IMinePool(minePool).lockAirDrop(tx.origin,ftpbnum);
