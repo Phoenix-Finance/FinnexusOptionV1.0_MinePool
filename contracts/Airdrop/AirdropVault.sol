@@ -1,5 +1,5 @@
 pragma solidity =0.5.16;
-import "./AirDropVaultData.sol";
+import "./AirdropVaultData.sol";
 import "../modules/SafeMath.sol";
 import "../ERC20/IERC20.sol";
 

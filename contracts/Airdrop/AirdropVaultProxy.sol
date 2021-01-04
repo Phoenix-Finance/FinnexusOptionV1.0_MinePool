@@ -1,5 +1,5 @@
 pragma solidity =0.5.16;
-import "./AirDropVaultData.sol";
+import "./AirdropVaultData.sol";
 import "../Proxy/baseProxy.sol";
 
 /**
