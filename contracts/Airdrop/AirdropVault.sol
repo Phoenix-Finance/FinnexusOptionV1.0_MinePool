@@ -78,8 +78,10 @@ contract AirDropVault is AirDropVaultData {
         require(fnxPerPerson!=0);
         
         require(airDropWhiteList[tx.origin]>0);
+
         uint256 amount = airDropWhiteList[tx.origin];
         airDropWhiteList[tx.origin] = 0;
+        IERC20(fnxToken).approve(optionColPool,amount);
         uint256 prefptb = IERC20(ftpbToken).balanceOf(address(this));
         IOptionMgrPoxy(optionColPool).addCollateral(fnxToken,amount);
         uint256 afterftpb = IERC20(ftpbToken).balanceOf(address(this));

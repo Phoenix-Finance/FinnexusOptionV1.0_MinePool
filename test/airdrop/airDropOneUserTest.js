@@ -15,11 +15,8 @@ const ONE_DAY = ONE_HOUR * 24;
 const ONE_MONTH = 30 * ONE_DAY;
 
 contract('TokenConverter', function (accounts) {
-    let cfnxAmount1 = new BN("60000000000000000000");
-    let cfnxAmount2 = new BN("120000000000000000000");
-    let cfnxAmount3 = new BN("125000000000000000000");
-    let fnxAmount = new BN("90000000000000000000000");
-
+    let fnxAmount = new BN("6");
+    let fnxPerPerson = new BN("1");
     let fptbInst;
     let fnxInst;
 
@@ -43,10 +40,10 @@ contract('TokenConverter', function (accounts) {
         fnxInst = await fptb.new();
         console.log("fnx address:" + fnxInst.address);
 
-        let tx = await minepoolInst.initialize(fptbInst.address);
+        let tx = await colpoolInst.initialize(fptbInst.address);
         assert.equal(tx.receipt.status,true);
 
-        tx = await colpoolInst.initialize(fptbInst.address);
+        tx = await minepoolInst.initialize(fptbInst.address);
         assert.equal(tx.receipt.status,true);
 
         airdropVaultInst = await airdropvault.new();
@@ -67,39 +64,49 @@ contract('TokenConverter', function (accounts) {
         tx = await airdropproxyInst.setFptbToken(fptbInst.address);
         assert.equal(tx.receipt.status,true);
 
-        tx = await airdropproxyInst.setFptbToken(fptbInst.address);
+
+        tx = await airdropproxyInst.setTotalAirdropFnx(web3.utils.toWei(fnxAmount));
         assert.equal(tx.receipt.status,true);
 
+        tx = await airdropproxyInst.setFnxPerPerson(web3.utils.toWei(fnxPerPerson));
+        assert.equal(tx.receipt.status,true);
 
+        tx = await fnxInst.mint(airdropproxyInst.address,web3.utils.toWei(fnxAmount));
+        assert.equal(tx.receipt.status,true);
+
+        let i = 1;
+        for(;i<7;i++) {
+            tx = await airdropproxyInst.addWhiteList(accounts[i]);
+            assert.equal(tx.receipt.status,true);
+        }
     });
 
-    it('1 User1 input CFNX and get 1/6 FNX', async function () {
-        // let beforeFnxUser =  await FNXInst.balanceOf(accounts[1]);
-        // let beforeCFnxBalanceUser = await CFNXInst.balanceOf(accounts[1]);
-        // console.log(beforeCFnxBalanceUser);
-        // console.log(await CFNXInst.allowance(accounts[1],CvntProxyInst.address));
-        //
-        // let beforeFnxBalanceProxy = await CFNXInst.balanceOf(CvntProxyInst.address);
-        // let tx = await CvntProxyInst.inputCfnxForInstallmentPay(cfnxAmount1,{from:accounts[1]});
-        // assert.equal(tx.receipt.status,true);
-        //
-        // let afterFnxUser =  await FNXInst.balanceOf(accounts[1]);
-        // let afterCFnxBalanceUser = await CFNXInst.balanceOf(accounts[1]);
-        // let afterFnxBalanceProxy = await CFNXInst.balanceOf(CvntProxyInst.address);
-        //
-        // let diffCFNXUser = web3.utils.fromWei(new BN(beforeCFnxBalanceUser)) - web3.utils.fromWei(new BN(afterCFnxBalanceUser));
-        // console.log("CFNX diff User:" + diffCFNXUser);
-        // let diffContract = web3.utils.fromWei(new BN(afterFnxBalanceProxy)) - web3.utils.fromWei(new BN(beforeFnxBalanceProxy));
-        // console.log("CFNX diff contract:" + diffContract);
-        // assert.equal(diffCFNXUser,diffContract);
-        //
-        // let diffFNXUser = web3.utils.fromWei(new BN(afterFnxUser)) - web3.utils.fromWei(new BN(beforeFnxUser));
-        // console.log("FNX diff user:" + diffFNXUser);
-        // assert.equal(diffFNXUser,diffContract/6);
-        //
-        // let lockedBalance = await CvntProxyInst.lockedBalanceOf(accounts[1]);
-        // console.log(lockedBalance);
-        // assert.equal(web3.utils.fromWei(lockedBalance),web3.utils.fromWei(cfnxAmount1)*5/6);
+    it('6 users claim adirdrop to minepool', async function () {
+        let i =1;
+        for(;i<7;i++) {
+            console.log("user"+i +" airdrop")
+            let beforeFnxAirdropproxy = await fnxInst.balanceOf(airdropproxyInst.address);
+            let beforeLockedFtpUser =  await minepoolInst.lockedBalances(accounts[i]);
+            let beforeFptbMinepool = await fptbInst.balanceOf(minepoolInst.address);
+
+            let tx = await airdropproxyInst.claim({from:accounts[i]});
+            assert.equal(tx.receipt.status,true);
+
+            let afterFnxAirdropproxy = await fnxInst.balanceOf(airdropproxyInst.address);
+            let afterLockedFtpUser =  await minepoolInst.lockedBalances(accounts[i]);
+            let afterFptbMinepool = await fptbInst.balanceOf(minepoolInst.address);
+
+            let diff = web3.utils.fromWei(new BN(beforeFnxAirdropproxy)) - web3.utils.fromWei(new BN(afterFnxAirdropproxy));
+            console.log("diff proxy fnx=" + diff);
+
+            diff = web3.utils.fromWei(new BN(afterLockedFtpUser)) - web3.utils.fromWei(new BN(beforeLockedFtpUser));
+            console.log("diff mine user locked fptb=" + diff);
+
+            diff = web3.utils.fromWei(new BN(afterFptbMinepool)) - web3.utils.fromWei(new BN(beforeFptbMinepool));
+            console.log("diff mine pool diff fptb=" + diff);
+
+
+          }
     })
 
 
