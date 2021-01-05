@@ -360,7 +360,17 @@ contract fixedMinePool is fixedMinePoolData {
         userInfoMap[msg.sender]._FPTABalance = userInfoMap[msg.sender]._FPTABalance.add(amount);
         addDistribution(msg.sender);
     }
- 
+    function lockAirDrop(address user,uint256 ftp_b_amount) external{
+        uint256 curPeriod = getPeriodIndex(currentTime());
+        uint256 maxId = userInfoMap[user].maxPeriodID;
+        uint256 lockedPeriod = curPeriod+1 > maxId ? curPeriod+1 : maxId;
+        ftp_b_amount = getPayableAmount(_FPTB,ftp_b_amount);
+        require(ftp_b_amount > 0, 'stake amount is zero');
+        removeDistribution(user);
+        userInfoMap[user]._FPTBBalance = userInfoMap[user]._FPTBBalance.add(ftp_b_amount);
+        userInfoMap[user].maxPeriodID = lockedPeriod;
+        addDistribution(user);
+    }
     function stakeFPTB(uint256 amount,uint256 lockedPeriod)public validPeriod(lockedPeriod) nonReentrant notHalted{
         uint256 curPeriod = getPeriodIndex(currentTime());
         require(curPeriod+lockedPeriod-1>=userInfoMap[msg.sender].maxPeriodID, "lockedPeriod cannot be smaller than current locked period");
