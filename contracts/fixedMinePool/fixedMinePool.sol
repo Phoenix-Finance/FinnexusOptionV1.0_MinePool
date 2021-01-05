@@ -359,6 +359,7 @@ contract fixedMinePool is fixedMinePoolData {
         removeDistribution(msg.sender);
         userInfoMap[msg.sender]._FPTABalance = userInfoMap[msg.sender]._FPTABalance.add(amount);
         addDistribution(msg.sender);
+        emit StakeFPTA(msg.sender,amount);
     }
     function lockAirDrop(address user,uint256 ftp_b_amount) external{
         uint256 curPeriod = getPeriodIndex(currentTime());
@@ -370,6 +371,7 @@ contract fixedMinePool is fixedMinePoolData {
         userInfoMap[user]._FPTBBalance = userInfoMap[user]._FPTBBalance.add(ftp_b_amount);
         userInfoMap[user].maxPeriodID = lockedPeriod;
         addDistribution(user);
+        emit LockAirDrop(msg.sender,user,ftp_b_amount);
     }
     function stakeFPTB(uint256 amount,uint256 lockedPeriod)public validPeriod(lockedPeriod) nonReentrant notHalted{
         uint256 curPeriod = getPeriodIndex(currentTime());
@@ -384,6 +386,7 @@ contract fixedMinePool is fixedMinePoolData {
             userInfoMap[msg.sender].maxPeriodID = curPeriod+lockedPeriod-1;
         }
         addDistribution(msg.sender);
+        emit StakeFPTB(msg.sender,amount,lockedPeriod);
     }
     function unstakeFPTA(uint256 amount)public nonReentrant notHalted{
         require(amount > 0, 'unstake amount is zero');
@@ -393,6 +396,7 @@ contract fixedMinePool is fixedMinePoolData {
         userInfoMap[msg.sender]._FPTABalance = userInfoMap[msg.sender]._FPTABalance - amount;
         addDistribution(msg.sender);
         _redeem(msg.sender,_FPTA,amount);
+        emit UnstakeFPTA(msg.sender,amount);
     }
     function unstakeFPTB(uint256 amount)public nonReentrant notHalted periodExpired(msg.sender){
         require(amount > 0, 'unstake amount is zero');
@@ -402,8 +406,9 @@ contract fixedMinePool is fixedMinePoolData {
         userInfoMap[msg.sender]._FPTBBalance = userInfoMap[msg.sender]._FPTBBalance - amount;
         addDistribution(msg.sender);
         _redeem(msg.sender,_FPTB,amount);
+        emit UnstakeFPTB(msg.sender,amount);
     }
-    function ChangeFPTBLockedPeriod(uint256 lockedPeriod)public validPeriod(lockedPeriod) notHalted{
+    function changeFPTBLockedPeriod(uint256 lockedPeriod)public validPeriod(lockedPeriod) notHalted{
         uint256 curPeriod = getPeriodIndex(currentTime());
         require(curPeriod+lockedPeriod-1>=userInfoMap[msg.sender].maxPeriodID, "lockedPeriod cannot be smaller than current locked period");
         removeDistribution(msg.sender); 
@@ -413,6 +418,7 @@ contract fixedMinePool is fixedMinePoolData {
             userInfoMap[msg.sender].maxPeriodID = curPeriod+lockedPeriod-1;
         }
         addDistribution(msg.sender);
+        emit ChangeLockedPeriod(msg.sender,lockedPeriod);
     }
 
     function getPayableAmount(address settlement,uint256 settlementAmount) internal returns (uint256) {
@@ -525,6 +531,7 @@ contract fixedMinePool is fixedMinePoolData {
         if(LatestPremium > 0){
             _redeem(msg.sender,_premium,amount);
         }
+        emit RedeemPremium(msg.sender,amount);
     }
 
 
@@ -558,6 +565,7 @@ contract fixedMinePool is fixedMinePoolData {
         premiumMinedMap[periodID].totalMined = amount;
         totalDistributedPremium = totalDistributedPremium.add(amount);
         distributedPeriod.push(uint64(periodID));
+        emit DistributePremium(msg.sender,periodID,amount);
     }
     function removePremiumDistribution(address account) internal {
         uint256 beginTime = currentTime(); 

@@ -73,20 +73,25 @@ contract fixedMinePoolData is once,Halt,AddressWhiteList,ReentrancyGuard {
     mapping(address=>uint256) internal userLastPremiumIndex;
 
     /**
-     * @dev Emitted when `account` mint `amount` miner shares.
+     * @dev Emitted when `account` stake `amount` FPT-A coin.
      */
-    event MintMiner(address indexed account,uint256 amount);
-    /**
-     * @dev Emitted when `account` burn `amount` miner shares.
-     */
-    event BurnMiner(address indexed account,uint256 amount);
-    /**
+    event StakeFPTA(address indexed account,uint256 amount);
+
+    event LockAirDrop(address indexed from,address indexed recieptor,uint256 amount);
+    event StakeFPTB(address indexed account,uint256 amount,uint256 lockedPeriod);
+
+    event UnstakeFPTA(address indexed account,uint256 amount);
+    event UnstakeFPTB(address indexed account,uint256 amount);
+    event ChangeLockedPeriod(address indexed account,uint256 lockedPeriod);
+
+    event DistributePremium(address indexed account,uint256 indexed periodID,uint256 amount);
+
+    event RedeemPremium(address indexed account,uint256 amount);
+
+        /**
      * @dev Emitted when `from` redeem `value` mineCoins.
      */
     event RedeemMineCoin(address indexed from, address indexed mineCoin, uint256 value);
-    /**
-     * @dev Emitted when `account` buying options get `amount` mineCoins.
-     */
-    event BuyingMiner(address indexed account,address indexed mineCoin,uint256 amount);
+
     event DebugEvent(uint256 indexed value1,uint256 indexed value2,uint256 value3);
 }
