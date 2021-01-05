@@ -1,0 +1,722 @@
+{
+	"compiler": {
+		"version": "0.5.16+commit.9c3226ce"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "FPTA",
+						"type": "address"
+					},
+					{
+						"internalType": "address",
+						"name": "FPTB",
+						"type": "address"
+					}
+				],
+				"payable": false,
+				"stateMutability": "nonpayable",
+				"type": "constructor"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "account",
+						"type": "address"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "amount",
+						"type": "uint256"
+					}
+				],
+				"name": "BurnMiner",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "account",
+						"type": "address"
+					},
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "mineCoin",
+						"type": "address"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "amount",
+						"type": "uint256"
+					}
+				],
+				"name": "BuyingMiner",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "account",
+						"type": "address"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "amount",
+						"type": "uint256"
+					}
+				],
+				"name": "MintMiner",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "previousOwner",
+						"type": "address"
+					},
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "newOwner",
+						"type": "address"
+					}
+				],
+				"name": "OwnershipTransferred",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "from",
+						"type": "address"
+					},
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "mineCoin",
+						"type": "address"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "value",
+						"type": "uint256"
+					}
+				],
+				"name": "RedeemMineCoin",
+				"type": "event"
+			},
+			{
+				"payable": true,
+				"stateMutability": "payable",
+				"type": "fallback"
+			},
+			{
+				"constant": false,
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "lockedPeriod",
+						"type": "uint256"
+					}
+				],
+				"name": "ChangeFPTBLockedPeriod",
+				"outputs": [],
+				"payable": false,
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"constant": false,
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "addAddress",
+						"type": "address"
+					}
+				],
+				"name": "addWhiteList",
+				"outputs": [],
+				"payable": false,
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"constant": true,
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "tmpAddress",
+						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "state",
+						"type": "uint256"
+					}
+				],
+				"name": "checkAddressPermission",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"payable": false,
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"constant": true,
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "mineCoin",
+						"type": "address"
+					}
+				],
+				"name": "getMineInfo",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"payable": false,
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"constant": true,
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "account",
+						"type": "address"
+					},
+					{
+						"internalType": "address",
+						"name": "mineCoin",
+						"type": "address"
+					}
+				],
+				"name": "getMinerBalance",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"payable": false,
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"constant": true,
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "mineCoin",
+						"type": "address"
+					}
+				],
+				"name": "getTotalMined",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"payable": false,
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"constant": true,
+				"inputs": [],
+				"name": "getWhiteList",
+				"outputs": [
+					{
+						"internalType": "address[]",
+						"name": "",
+						"type": "address[]"
+					}
+				],
+				"payable": false,
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"constant": false,
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "FPTA",
+						"type": "address"
+					},
+					{
+						"internalType": "address",
+						"name": "FPTB",
+						"type": "address"
+					}
+				],
+				"name": "initialize",
+				"outputs": [],
+				"payable": false,
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"constant": true,
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "tmpAddress",
+						"type": "address"
+					}
+				],
+				"name": "isEligibleAddress",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"payable": false,
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"constant": true,
+				"inputs": [],
+				"name": "isOwner",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"payable": false,
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"constant": false,
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "addAddress",
+						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "permission",
+						"type": "uint256"
+					}
+				],
+				"name": "modifyPermission",
+				"outputs": [],
+				"payable": false,
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"constant": true,
+				"inputs": [],
+				"name": "owner",
+				"outputs": [
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"payable": false,
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"constant": false,
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "mineCoin",
+						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "amount",
+						"type": "uint256"
+					}
+				],
+				"name": "redeemMinerCoin",
+				"outputs": [],
+				"payable": false,
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"constant": false,
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "mineCoin",
+						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "amount",
+						"type": "uint256"
+					}
+				],
+				"name": "redeemOut",
+				"outputs": [],
+				"payable": false,
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"constant": false,
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "removeAddress",
+						"type": "address"
+					}
+				],
+				"name": "removeWhiteList",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"payable": false,
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"constant": false,
+				"inputs": [],
+				"name": "renounceOwnership",
+				"outputs": [],
+				"payable": false,
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"constant": false,
+				"inputs": [
+					{
+						"internalType": "bool",
+						"name": "halt",
+						"type": "bool"
+					}
+				],
+				"name": "setHalt",
+				"outputs": [],
+				"payable": false,
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"constant": false,
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "mineCoin",
+						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "_mineAmount",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "_mineInterval",
+						"type": "uint256"
+					}
+				],
+				"name": "setMineCoinInfo",
+				"outputs": [],
+				"payable": false,
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"constant": false,
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "amount",
+						"type": "uint256"
+					}
+				],
+				"name": "stakeFPTA",
+				"outputs": [],
+				"payable": false,
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"constant": false,
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "amount",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "lockedPeriod",
+						"type": "uint256"
+					}
+				],
+				"name": "stakeFPTB",
+				"outputs": [],
+				"payable": false,
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"constant": false,
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "newOwner",
+						"type": "address"
+					}
+				],
+				"name": "transferOwnership",
+				"outputs": [],
+				"payable": false,
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"constant": false,
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "amount",
+						"type": "uint256"
+					}
+				],
+				"name": "unstakeFPTA",
+				"outputs": [],
+				"payable": false,
+				"stateMutability": "nonpayable",
+				"type": "function"
+			}
+		],
+		"devdoc": {
+			"details": "A smart-contract which distribute some mine coins by FPTCoin balance.  ",
+			"methods": {
+				"addWhiteList(address)": {
+					"details": "Implementation of add an eligible address into the whitelist.",
+					"params": {
+						"addAddress": "new eligible address."
+					}
+				},
+				"getMineInfo(address)": {
+					"details": "retrieve minecoin distributed informations.",
+					"params": {
+						"mineCoin": "mineCoin address"
+					},
+					"return": "distributed amount and distributed time interval."
+				},
+				"getMinerBalance(address,address)": {
+					"details": "retrieve user's mine balance.",
+					"params": {
+						"account": "user's account",
+						"mineCoin": "mineCoin address"
+					}
+				},
+				"getTotalMined(address)": {
+					"details": "retrieve total distributed mine coins.",
+					"params": {
+						"mineCoin": "mineCoin address"
+					}
+				},
+				"getWhiteList()": {
+					"details": "Implementation of getting the eligible whitelist."
+				},
+				"isEligibleAddress(address)": {
+					"details": "Implementation of testing whether the input address is eligible.",
+					"params": {
+						"tmpAddress": "input address for testing."
+					}
+				},
+				"isOwner()": {
+					"details": "Returns true if the caller is the current owner."
+				},
+				"owner()": {
+					"details": "Returns the address of the current owner."
+				},
+				"redeemMinerCoin(address,uint256)": {
+					"details": "user redeem mine rewards.",
+					"params": {
+						"amount": "redeem amount.",
+						"mineCoin": "mine coin address"
+					}
+				},
+				"redeemOut(address,uint256)": {
+					"details": "foundation redeem out mine coins.",
+					"params": {
+						"amount": "redeem amount.",
+						"mineCoin": "mineCoin address"
+					}
+				},
+				"removeWhiteList(address)": {
+					"details": "Implementation of revoke an invalid address from the whitelist.",
+					"params": {
+						"removeAddress": "revoked address."
+					}
+				},
+				"renounceOwnership()": {
+					"details": "Leaves the contract without owner. It will not be possible to call `onlyOwner` functions anymore. Can only be called by the current owner.      * NOTE: Renouncing ownership will leave the contract without an owner, thereby removing any functionality that is only available to the owner."
+				},
+				"setMineCoinInfo(address,uint256,uint256)": {
+					"details": "Set mineCoin mine info, only foundation owner can invoked.",
+					"params": {
+						"_mineAmount": "mineCoin distributed amount",
+						"_mineInterval": "mineCoin distributied time interval",
+						"mineCoin": "mineCoin address"
+					}
+				},
+				"transferOwnership(address)": {
+					"details": "Transfers ownership of the contract to a new account (`newOwner`). Can only be called by the current owner."
+				}
+			},
+			"title": "FPTCoin mine pool, which manager contract is FPTCoin."
+		},
+		"userdoc": {
+			"methods": {
+				"setHalt(bool)": {
+					"notice": "function Emergency situation that requires contribution period to stop or not."
+				}
+			}
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			"localhost/contracts/fixedMinePool/fixedMinePool.sol": "fixedMinePool"
+		},
+		"evmVersion": "istanbul",
+		"libraries": {},
+		"optimizer": {
+			"enabled": false,
+			"runs": 200
+		},
+		"remappings": []
+	},
+	"sources": {
+		"localhost/contracts/ERC20/IERC20.sol": {
+			"keccak256": "0x3f11e352b753d34c5b12012a5101fad6d2a35f539f31aa7d88aed2001c02f6fc",
+			"urls": [
+				"bzz-raw://9b2f9b94bc971554502db91b2224b9620fd724a4b374a05373cefcf737cade6a",
+				"dweb:/ipfs/QmeuCBAi6GFzLbh3z8qby6acgjFJxKbywCP71oS9G3Hsna"
+			]
+		},
+		"localhost/contracts/fixedMinePool/fixedMinePool.sol": {
+			"keccak256": "0x7bc398d53fa666d9b67c5d40c1ace69b4de8a2a6d54479142ba6974cc4d5d003",
+			"urls": [
+				"bzz-raw://8716f76c3334609cfc12417f68ed4f4f937e15f86fb681f13c017d6a41b9fe45",
+				"dweb:/ipfs/QmfQ2rvGwJ3pBpVurPeVkgciimBTY5QFTtJinPqxP6Amk9"
+			]
+		},
+		"localhost/contracts/fixedMinePool/fixedMinePoolData.sol": {
+			"keccak256": "0xe38048e0b3363384ae58bc5bf44d4594721dd7ca068e0eb2e3373cbebc1d0b02",
+			"urls": [
+				"bzz-raw://3991a14fea812c16047bb96c6efdb9ef590186d75611f6bd697278240239d0f8",
+				"dweb:/ipfs/QmemPRzguCimKYtxPZ468PmHSYbMsHojgwa1ZvekvXnrHR"
+			]
+		},
+		"localhost/contracts/modules/AddressWhiteList.sol": {
+			"keccak256": "0x44af1c27acfd207a52b7543a49063a2b9c4f90b4890bb60dc693437aac6f363e",
+			"urls": [
+				"bzz-raw://54f2fd77d414927da6e456be9890cf24ea5d03ffe88d5f59833a6ef2f6bf0778",
+				"dweb:/ipfs/QmaxZfHyFyDDXr66tXirXcSJuCt6zXiSWqb9kAvhPoGqfq"
+			]
+		},
+		"localhost/contracts/modules/Halt.sol": {
+			"keccak256": "0x4decad501065bc7cac2133a68b8c1103ee4888b90318bed58706c47afe9c0c05",
+			"urls": [
+				"bzz-raw://bdb78b06241ec0d18a75acbd7c90ecb0bc3f1f21ddf4467e563b8ed1ba672271",
+				"dweb:/ipfs/Qmc4hqMpXR32k5K1ygra9NDNgG3kFRexQ67DrDpsiMcuMF"
+			]
+		},
+		"localhost/contracts/modules/Ownable.sol": {
+			"keccak256": "0xbee80fd7a5d8bfc985dfb69ab47d582835fbf1e3352598e9c75ee931d8201b5d",
+			"urls": [
+				"bzz-raw://e388e11e0172712bf10327ddee6df03aeebeda1218734aadb40b1d2a46567d8d",
+				"dweb:/ipfs/QmXn5T5gAAZmNKWvXNV9YkuDv7h5ppvdYwACUT5yD7ycxD"
+			]
+		},
+		"localhost/contracts/modules/ReentrancyGuard.sol": {
+			"keccak256": "0x94e5c19b5d35ad0ff09a2e94616c24ced8f28c2e988be99a74d839b9d2036a6a",
+			"urls": [
+				"bzz-raw://ce65b1d27f18165385dc990738335da3e6acd1c144f3c82c0b85e8835dc9d404",
+				"dweb:/ipfs/QmQnXdScAx2W1RXHWQiMchqGSzoEeKwCLFBqQ3hibQMYoX"
+			]
+		},
+		"localhost/contracts/modules/SafeMath.sol": {
+			"keccak256": "0xeb295b448107f6adee6c0861eba7cd58983eeb1a2bf9cd24b3df9c75fe17db75",
+			"urls": [
+				"bzz-raw://781a662595af8ecda052135a27529293189c1cdf40bc5e2934a62b3bc2b327ea",
+				"dweb:/ipfs/QmNaGn5PyRCu3tfBu6mMwx3j2BHJiXWKiYGHSAu3au6P7S"
+			]
+		},
+		"localhost/contracts/modules/once.sol": {
+			"keccak256": "0x7cd13768d3bba1503dd35acba66a29ce235e7c885e2ee0363667849181d7667b",
+			"urls": [
+				"bzz-raw://78ec581c31f09aee61a7e45867f82cd41aabb1a0f9a9d626636f5ab4d399af9d",
+				"dweb:/ipfs/QmNQv1jVXGoJXD6dnMJQ5Qv8vDpDmfo5BMufTr6494gVqs"
+			]
+		},
+		"localhost/contracts/modules/whiteList.sol": {
+			"keccak256": "0xf77774a06a719d17391c46d647545a6de8828169476930cda266c82ae4ec3476",
+			"urls": [
+				"bzz-raw://599893aa12ecbf104b0c59d9a0d07d6cf5547798c0be3f9b4d081711d5be98a8",
+				"dweb:/ipfs/Qmcs5UZ1BVTwMbW7TCVErKzhKDgduSu7sXu453T4fND7UG"
+			]
+		}
+	},
+	"version": 1
+}
