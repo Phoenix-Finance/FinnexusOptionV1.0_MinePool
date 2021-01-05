@@ -101,13 +101,15 @@ contract('TokenConverter', function (accounts) {
 
             diff = web3.utils.fromWei(new BN(afterLockedFtpUser)) - web3.utils.fromWei(new BN(beforeLockedFtpUser));
             console.log("diff mine user locked fptb=" + diff);
+            assert.equal(diff,1);
 
             diff = web3.utils.fromWei(new BN(afterFptbMinepool)) - web3.utils.fromWei(new BN(beforeFptbMinepool));
             console.log("diff mine pool diff fptb=" + diff);
-
-
+            assert.equal(diff,1);
           }
     })
+
+
 
 
 })

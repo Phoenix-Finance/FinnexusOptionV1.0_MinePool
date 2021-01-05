@@ -16,7 +16,6 @@ contract('TokenConverter', function (accounts) {
     let cfnxAmount1 = new BN("60000000000000000000");
     let cfnxAmount2 = new BN("120000000000000000000");
     let cfnxAmount3 = new BN("125000000000000000000");
-
     let fnxAmount = new BN("90000000000000000000000");
 
     let CFNXInst;

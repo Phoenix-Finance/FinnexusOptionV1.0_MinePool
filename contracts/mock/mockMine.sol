@@ -12,7 +12,7 @@ contract mockMine is Ownable,ERC20{
         require(user != address(0));
         require(ftp_b_amount > 0);
         lockedBalances[user] = ftp_b_amount;
-        ERC20(pftb).transfer(address(this),ftp_b_amount);    
+         ERC20(pftb).transferFrom(msg.sender,address(this),ftp_b_amount);
     }
 
 
