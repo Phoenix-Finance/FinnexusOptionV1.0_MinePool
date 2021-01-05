@@ -15,7 +15,7 @@ const ONE_DAY = ONE_HOUR * 24;
 const ONE_MONTH = 30 * ONE_DAY;
 
 contract('TokenConverter', function (accounts) {
-    let fnxAmount = new BN("6");
+    let fnxAmount = new BN("7");
     let fnxPerPerson = new BN("1");
     let fptbInst;
     let fnxInst;
@@ -109,7 +109,22 @@ contract('TokenConverter', function (accounts) {
           }
     })
 
+    it('get back left fnx', async function () {
+        let beforeFnxAirdropproxy = await fnxInst.balanceOf(airdropproxyInst.address);
+        let beforeUser7Fnx =  await fnxInst.balanceOf(accounts[7]);
+        let tx = await airdropproxyInst.getbackLeftFnx(accounts[7]);
+        assert.equal(tx.receipt.status,true);
+        let afterFnxAirdropproxy = await fnxInst.balanceOf(airdropproxyInst.address);
+        let afterUser7Fnx =  await fnxInst.balanceOf(accounts[7]);
 
+        let diff = web3.utils.fromWei(new BN(beforeFnxAirdropproxy)) - web3.utils.fromWei(new BN(afterFnxAirdropproxy));
+        console.log("diff proxy fnx=" + diff);
+        assert.equal(diff,1);
+
+        diff = web3.utils.fromWei(new BN(afterUser7Fnx)) - web3.utils.fromWei(new BN(beforeUser7Fnx));
+        console.log("diff proxy fnx=" + diff);
+        assert.equal(diff,1);
+    })
 
 
 })
