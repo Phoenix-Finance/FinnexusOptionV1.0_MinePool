@@ -33,10 +33,10 @@ contract TokenConverterData is Managerable {
     /**
      * @dev Emitted when `owner` locked  `amount` FPT, which net worth is  `worth` in USD. 
      */
-    event AddLocked(address indexed owner, uint256 amount,uint256 worth);
+    event InputCfnx(address indexed owner, uint256 indexed amount,uint256 indexed worth);
     /**
-     * @dev Emitted when `owner` burned locked  `amount` FPT, which net worth is  `worth` in USD. 
+     * @dev Emitted when `owner` burned locked  `amount` FPT, which net worth is  `worth` in USD.
      */
-    event BurnLocked(address indexed owner, uint256 amount,uint256 worth);
+    event ClaimFnx(address indexed owner, uint256 indexed amount,uint256 indexed worth);
 
 }
