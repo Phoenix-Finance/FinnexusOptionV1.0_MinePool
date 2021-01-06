@@ -7,19 +7,19 @@ pragma solidity =0.5.16;
 import "../modules/Halt.sol";
 import "../modules/AddressWhiteList.sol";
 import "../modules/ReentrancyGuard.sol";
-import "../modules/once.sol";
+import "../modules/initializable.sol";
 /**
  * @title FPTCoin mine pool, which manager contract is FPTCoin.
  * @dev A smart-contract which distribute some mine coins by FPTCoin balance.
  *
  */
-contract fixedMinePoolData is once,Halt,AddressWhiteList,ReentrancyGuard {
+contract fixedMinePoolData is initializable,Halt,AddressWhiteList,ReentrancyGuard {
     //Special decimals for calculation
     uint256 constant calDecimals = 1e18;
 
     uint256 internal _startTime;
     uint256 internal constant _period = 90 days;
-    uint256 internal _flexibleExpired = 15 days;
+    uint256 internal _flexibleExpired;
 
     uint256 constant internal _minPeriod = 1; 
     uint256 constant internal _maxPeriod = 12;

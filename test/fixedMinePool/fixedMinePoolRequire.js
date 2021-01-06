@@ -25,7 +25,6 @@ contract('fixedMinePool', function (accounts){
             assert.equal(endTime.toNumber(),startTime +i*PeriodTime,"getPeriodFinishTime Error");
         }
     });
-
     it('fixedMinePool stake FPTA function', async function (){
         let contracts = await migrateTestMinePool(accounts);
         await contracts.minePool.stakeFPTA(100000);
@@ -41,6 +40,9 @@ contract('fixedMinePool', function (accounts){
         fptB = await contracts.minePool.getUserFPTBBalance(accounts[0]);
         assert.equal(fptA.toNumber(),200000,"getUserFPTABalance Error");
         assert.equal(fptB.toNumber(),0,"getUserFPTBBalance Error");
+        let expired = await contracts.minePool.getUserExpired(accounts[0]);
+        let curtime = Date.now()/1000+86400*15;
+        assert(Math.abs(expired.toNumber()-curtime)<10,"getTotalMined error");
         contractBalance = await contracts.CFNXA.balanceOf(contracts.minePool.address);
         assert.equal(contractBalance.toNumber(),200000,"getUserFPTABalance Error");
         await checkUserDistribution(contracts,accounts[0]);

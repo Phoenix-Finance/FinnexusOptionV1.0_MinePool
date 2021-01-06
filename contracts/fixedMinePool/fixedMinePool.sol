@@ -15,7 +15,11 @@ import "../ERC20/IERC20.sol";
 contract fixedMinePool is fixedMinePoolData {
     using SafeMath for uint256;
     constructor(address FPTA,address FPTB,address USDC,uint256 startTime)public{
-        initialize(FPTA,FPTB,USDC,startTime);
+        _FPTA = FPTA;
+        _FPTB = FPTB;
+        _premium = USDC;
+        _startTime = startTime;
+        initialize();
     }
     /**
      * @dev default function for foundation input miner coins.
@@ -23,7 +27,12 @@ contract fixedMinePool is fixedMinePoolData {
     function()external payable{
 
     }
-    function initialize(address FPTA,address FPTB,address USDC,uint256 startTime) onlyOwner public {
+    function initialize() initializer public {
+        _owner = msg.sender;
+        emit OwnershipTransferred(address(0), _owner);
+        _flexibleExpired = 15 days;
+    }
+    function setAddresses(address FPTA,address FPTB,address USDC,uint256 startTime) public onlyOwner {
         _FPTA = FPTA;
         _FPTB = FPTB;
         _premium = USDC;
@@ -58,6 +67,9 @@ contract fixedMinePool is fixedMinePoolData {
     }
     function getUserMaxPeriodId(address account)public view returns (uint256) {
         return userInfoMap[account].maxPeriodID;
+    }
+    function getUserExpired(address account)public view returns (uint256) {
+        return userInfoMap[account].lockedExpired;
     }
     /**
      * @dev foundation redeem out mine coins.

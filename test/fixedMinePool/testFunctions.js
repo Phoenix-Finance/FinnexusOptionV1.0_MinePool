@@ -1,5 +1,6 @@
 const fixedMinePool = artifacts.require("fixedMinePool_test");
 const fixedMinePool_Timed = artifacts.require("fixedMinePool_Timed");
+const minePoolProxy = artifacts.require("testMinePoolProxy");
 const CFNX = artifacts.require("CFNX");
 exports.migrateTestMinePool =  async function (accounts){
     let CFNXA = await CFNX.new();
@@ -7,7 +8,8 @@ exports.migrateTestMinePool =  async function (accounts){
     let USDC = await CFNX.new();
     let Mine = await CFNX.new();
     let startTime = 10000000;
-    let minePool = await fixedMinePool.new(CFNXA.address,CFNXB.address,USDC.address,startTime);
+    let minePoolImpl = await fixedMinePool.new(CFNXA.address,CFNXB.address,USDC.address,startTime);
+    let minePool = await minePoolProxy.new(minePoolImpl.address,CFNXA.address,CFNXB.address,USDC.address,startTime);
     await CFNXA.mint(accounts[0],1000000000000000);
     await CFNXA.approve(minePool.address,1000000000000000);
     await CFNXB.mint(accounts[0],1000000000000000);
@@ -36,7 +38,8 @@ exports.migrateTimedMinePool =  async function (accounts){
     let USDC = await CFNX.new();
     let Mine = await CFNX.new();
     let startTime = 10000000;
-    let minePool = await fixedMinePool_Timed.new(CFNXA.address,CFNXB.address,USDC.address,startTime);
+    let minePoolImpl = await fixedMinePool_Timed.new(CFNXA.address,CFNXB.address,USDC.address,startTime);
+    let minePool = await minePoolProxy.new(minePoolImpl.address,CFNXA.address,CFNXB.address,USDC.address,startTime);
     await CFNXA.mint(accounts[0],1000000000000000);
     await CFNXA.approve(minePool.address,1000000000000000);
     
