@@ -299,15 +299,15 @@ contract fixedMinePool is fixedMinePoolData {
         uint256 latestTime = mineInfoMap[mineCoin].latestSettleTime;
         uint256 curIndex = getPeriodIndex(latestTime);
         uint256 latestMined = 0;
-        for (uint256 i=0;i<50;i++){
+        for (uint256 i=0;i<_maxLoop;i++){
             if (totalDistribution == 0){
                 break;
             }
             uint256 finishTime = getPeriodFinishTime(curIndex);
             if (finishTime < currentTime()){
-                latestMined.add(_getPeriodWeightMined(mineCoin,curIndex,finishTime.sub(latestTime)));
+                latestMined = latestMined.add(_getPeriodWeightMined(mineCoin,curIndex,finishTime.sub(latestTime)));
             }else{
-                latestMined.add(_getPeriodWeightMined(mineCoin,curIndex,currentTime().sub(latestTime)));
+                latestMined = latestMined.add(_getPeriodWeightMined(mineCoin,curIndex,currentTime().sub(latestTime)));
                 break;
             }
             curIndex++;
