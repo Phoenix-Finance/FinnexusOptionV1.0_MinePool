@@ -23,7 +23,7 @@ contract fixedMinePoolData is initializable,Halt,AddressWhiteList,ReentrancyGuar
 
     uint256 constant internal _minPeriod = 1; 
     uint256 constant internal _maxPeriod = 12;
-    uint256 constant internal _maxLoop = 200;
+    uint256 constant internal _maxLoop = 120;
     uint256 constant internal _FPTARatio = 1000;
     uint256 constant internal _FPTBRatio = 1000;
     uint256 constant internal _RepeatRatio = 20000;

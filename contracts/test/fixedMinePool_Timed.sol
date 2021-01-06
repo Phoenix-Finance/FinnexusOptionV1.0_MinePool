@@ -17,6 +17,9 @@ contract fixedMinePool_Timed is fixedMinePool {
     constructor(address FPTA,address FPTB,address USDC,uint256 startTime)public fixedMinePool(FPTA,FPTB,USDC,startTime){
         _flexibleExpired = 0;
     }
+    function update() public onlyOwner{
+        _flexibleExpired = 0;
+    }
     function setTime(uint256 _time) public{
         _timeAccumulation = _time;
     }

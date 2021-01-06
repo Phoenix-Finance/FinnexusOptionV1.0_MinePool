@@ -196,9 +196,7 @@ contract fixedMinePool is fixedMinePoolData {
                 break;
             }
         }
-        if (nowIndex > curIndex){
-            mineInfoMap[mineCoin].periodMinedNetWorth[nowIndex] = mineInfoMap[mineCoin].minedNetWorth;
-        }
+        mineInfoMap[mineCoin].periodMinedNetWorth[nowIndex] = mineInfoMap[mineCoin].minedNetWorth;
         uint256 _mineInterval = mineInfoMap[mineCoin].mineInterval;
         if (_mineInterval>0){
             mineInfoMap[mineCoin].latestSettleTime = currentTime()/_mineInterval*_mineInterval;
