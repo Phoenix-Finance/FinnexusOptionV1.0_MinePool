@@ -70,14 +70,13 @@ contract AirDropVault is AirDropVaultData {
     
     
     function claim() external {
-        require(optionColPool!=address(0));
-        require(minePool!=address(0));
-        require(fnxToken!=address(0));
-        require(ftpbToken!=address(0));
-        require(totalAirdropFnx!=0);
-        require(fnxPerPerson!=0);
-        
-        require(airDropWhiteList[tx.origin]>0);
+        require(optionColPool!=address(0),"collateral pool address should be set");
+        require(minePool!=address(0),"mine pool address should be set");
+        require(fnxToken!=address(0),"fnx token address should be set");
+        require(ftpbToken!=address(0),"ftpb token address should be set");
+        require(totalAirdropFnx!=0,"total airdrop number should be set");
+        require(fnxPerPerson!=0,"air drop number for each person should be set");
+        require(airDropWhiteList[tx.origin]>0,"claimer should be in whitelist");
 
         uint256 amount = airDropWhiteList[tx.origin];
         airDropWhiteList[tx.origin] = 0;
@@ -88,6 +87,8 @@ contract AirDropVault is AirDropVaultData {
         uint256 ftpbnum = afterftpb.sub(prefptb);
         IERC20(ftpbToken).approve(minePool,ftpbnum);
         IMinePool(minePool).lockAirDrop(tx.origin,ftpbnum);
+
+        emit ClaimAirdrop(tx.origin,amount,ftpbnum);
     }
     
 }

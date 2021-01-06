@@ -64,7 +64,7 @@ contract TokenConverter is TokenConverterData {
 
 
     function inputCfnxForInstallmentPay(uint256 amount) external inited {
-        require(amount>0);
+        require(amount>0,"amount should be bigger than 0");
         
         IERC20(cfnxAddress).transferFrom(tx.origin,address(this),amount);
         uint256 idx = lockedIndexs[tx.origin].totalIdx;
@@ -88,12 +88,13 @@ contract TokenConverter is TokenConverterData {
         lockedIndexs[tx.origin].totalIdx =  lockedIndexs[tx.origin].totalIdx + 1;
         
         IERC20(fnxAddress).transfer(tx.origin,divAmount);
-        
+
+        emit InputCfnx(tx.origin,amount,divAmount);
     }
     
     
     function claimFnxExpiredReward() external inited {
-        require(fnxAddress!=address(0));
+        require(fnxAddress!=address(0),"fnx token should be set");
         
         uint256 txcnt = 0;
         uint256 i = lockedIndexs[tx.origin].beginIdx;
@@ -138,6 +139,8 @@ contract TokenConverter is TokenConverterData {
         lockedBalances[tx.origin] = lockedBalances[tx.origin].sub(totalRet);
         //transfer back to user
         IERC20(fnxAddress).transfer(tx.origin,totalRet);
+        
+        emit ClaimFnx(tx.origin,totalRet,txcnt);
     }
     
 }

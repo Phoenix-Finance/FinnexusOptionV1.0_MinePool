@@ -20,6 +20,6 @@ contract AirDropVaultData is Managerable {
     /**
      * @dev Emitted when `owner` locked  `amount` FPT, which net worth is  `worth` in USD. 
      */
-    event ClaimAirdrop(address indexed claimer, uint256 amount);
+    event ClaimAirdrop(address indexed claimer, uint256 indexed amount,uint256 indexed ftpbnum);
 
 }
