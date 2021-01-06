@@ -2,11 +2,18 @@ pragma solidity =0.5.16;
 import "../Proxy/newBaseProxy.sol";
 
 /**
- * @title FPTCoin is finnexus collateral Pool token, implement ERC20 interface.
- * @dev ERC20 token. Its inside value is collatral pool net worth.
+ * @title FNX period mine pool.
+ * @dev A smart-contract which distribute some mine coins when user stake FPT-A and FPT-B coins.
  *
  */
 contract fixedMinePoolProxy is newBaseProxy {
+    /**
+    * @dev constructor.
+    * @param FPTA FPT-A coin's address,staking coin
+    * @param FPTB FPT-B coin's address,staking coin
+    * @param USDC USDC coin's address,premium coin
+    * @param startTime the start time when this mine pool begin.
+    */
     constructor (address implementation_,address FPTA,address FPTB,address USDC,uint256 startTime) newBaseProxy(implementation_) public{
         (bool success,) = implementation_.delegatecall(abi.encodeWithSignature(
                 "setAddresses(address,address,address,uint256)",

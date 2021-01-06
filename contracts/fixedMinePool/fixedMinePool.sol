@@ -8,12 +8,19 @@ import "../modules/SafeMath.sol";
 import "./fixedMinePoolData.sol";
 import "../ERC20/IERC20.sol";
 /**
- * @title FPTCoin mine pool, which manager contract is FPTCoin.
- * @dev A smart-contract which distribute some mine coins by FPTCoin balance.
+ * @title FNX period mine pool.
+ * @dev A smart-contract which distribute some mine coins when user stake FPT-A and FPT-B coins.
  *
  */
 contract fixedMinePool is fixedMinePoolData {
     using SafeMath for uint256;
+    /**
+     * @dev constructor.
+     * @param FPTA FPT-A coin's address,staking coin
+     * @param FPTB FPT-B coin's address,staking coin
+     * @param USDC USDC coin's address,premium coin
+     * @param startTime the start time when this mine pool begin.
+     */
     constructor(address FPTA,address FPTB,address USDC,uint256 startTime)public{
         _FPTA = FPTA;
         _FPTB = FPTB;
@@ -27,11 +34,21 @@ contract fixedMinePool is fixedMinePoolData {
     function()external payable{
 
     }
+    /**
+     * @dev initial function when the proxy contract deployed.
+     */
     function initialize() initializer public {
         _owner = msg.sender;
         emit OwnershipTransferred(address(0), _owner);
         _flexibleExpired = 15 days;
     }
+    /**
+     * @dev setting function.
+     * @param FPTA FPT-A coin's address,staking coin
+     * @param FPTB FPT-B coin's address,staking coin
+     * @param USDC USDC coin's address,premium coin
+     * @param startTime the start time when this mine pool begin.
+     */
     function setAddresses(address FPTA,address FPTB,address USDC,uint256 startTime) public onlyOwner {
         _FPTA = FPTA;
         _FPTB = FPTB;
@@ -56,12 +73,23 @@ contract fixedMinePool is fixedMinePoolData {
     function getStartTime()public view returns (uint256) {
         return _startTime;
     }
+    /**
+     * @dev getting current mine period ID.
+     */
     function getCurrentPeriodID()public view returns (uint256) {
         return getPeriodIndex(currentTime());
     }
+    /**
+     * @dev getting user's staking FPT-A balance.
+     * @param account user's account
+     */
     function getUserFPTABalance(address account)public view returns (uint256) {
         return userInfoMap[account]._FPTABalance;
     }
+    /**
+     * @dev getting user's staking FPT-B balance.
+     * @param account user's account
+     */
     function getUserFPTBBalance(address account)public view returns (uint256) {
         return userInfoMap[account]._FPTBBalance;
     }
