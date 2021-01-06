@@ -195,41 +195,39 @@ contract fixedMinePool is fixedMinePoolData {
         }
     }
     function _mineSettlementPeriod(address mineCoin,uint256 periodID,uint256 mineTime)internal{
-        uint256 totalDistri = getTotalDistribution(periodID);
+        uint256 totalDistri = totalDistribution;
         if (totalDistri > 0){
             uint256 latestMined = _getPeriodMined(mineCoin,periodID,mineTime);
             if (latestMined>0){
                 mineInfoMap[mineCoin].minedNetWorth = mineInfoMap[mineCoin].minedNetWorth.add(latestMined.mul(calDecimals)/totalDistri);
                 mineInfoMap[mineCoin].totalMinedCoin = mineInfoMap[mineCoin].totalMinedCoin.add(latestMined.mul(
-                    getweightDistribution(periodID)).div(getTotalDistribution(periodID)));
+                    getweightDistribution(periodID))/totalDistri);
             }
         }
         mineInfoMap[mineCoin].periodMinedNetWorth[periodID] = mineInfoMap[mineCoin].minedNetWorth;
     }
     function _settleUserMine(address mineCoin,address account) internal {
         uint256 nowIndex = getPeriodIndex(currentTime());
-        uint256 userPeriod = userInfoMap[account].settlePeriod[mineCoin];
-        if (userPeriod < mineInfoMap[mineCoin].startPeriod){
-            userPeriod = mineInfoMap[mineCoin].startPeriod;
-        }
-        for (uint256 i = 0;i<_maxLoop;i++){
-            uint256 periodDistri = userPeriodDistribution(account,userPeriod);
-            if (periodDistri == 0){
-                break;
+        if(userInfoMap[account].distribution>0){
+            uint256 userPeriod = userInfoMap[account].settlePeriod[mineCoin];
+            if (userPeriod < mineInfoMap[mineCoin].startPeriod){
+                userPeriod = mineInfoMap[mineCoin].startPeriod;
             }
-            _settlementPeriod(mineCoin,account,userPeriod);
-            if (userPeriod >= nowIndex){
-                break;
+            
+            for (uint256 i = 0;i<_maxLoop;i++){
+                _settlementPeriod(mineCoin,account,userPeriod);
+                if (userPeriod >= nowIndex){
+                    break;
+                }
+                userPeriod++;
             }
-            userPeriod++;
         }
         userInfoMap[account].minerOrigins[mineCoin] = _getTokenNetWorth(mineCoin,nowIndex);
         userInfoMap[account].settlePeriod[mineCoin] = nowIndex;
     }
     function _settlementPeriod(address mineCoin,address account,uint256 periodID) internal {
         uint256 tokenNetWorth = _getTokenNetWorth(mineCoin,periodID);
-        uint256 _totalDistri = getTotalDistribution(periodID);
-        if (_totalDistri > 0){
+        if (totalDistribution > 0){
             userInfoMap[account].minerBalances[mineCoin] = userInfoMap[account].minerBalances[mineCoin].add(
                 _settlement(mineCoin,account,periodID,tokenNetWorth));
         }
@@ -237,19 +235,16 @@ contract fixedMinePool is fixedMinePoolData {
     }
     function _getTokenNetWorth(address mineCoin,uint256 periodID)internal view returns(uint256){
         return mineInfoMap[mineCoin].periodMinedNetWorth[periodID];
-        /*
-        uint256 _totalDistri = getTotalDistribution(periodID);
-        if (_totalDistri > 0){
-            return mineInfoMap[mineCoin].periodMinedWorth[periodID]/_totalDistri;
-        }
-        return mineInfoMap[mineCoin].totalMinedWorth/_totalDistri;
-        */
     }
 
     /**
      * @dev the auxiliary function for _mineSettlementAll. Calculate latest time phase distributied mine amount.
      */ 
     function _getUserLatestMined(address mineCoin,address account)internal view returns(uint256){
+        uint256 userDistri = userInfoMap[account].distribution;
+        if (userDistri == 0){
+            return 0;
+        }
         uint256 userperiod = userInfoMap[account].settlePeriod[mineCoin];
         if (userperiod < mineInfoMap[mineCoin].startPeriod){
             userperiod = mineInfoMap[mineCoin].startPeriod;
@@ -259,13 +254,12 @@ contract fixedMinePool is fixedMinePoolData {
         uint256 nowIndex = getPeriodIndex(currentTime());
         uint256 userMaxPeriod = userInfoMap[account].maxPeriodID;
         uint256 netWorth = _getTokenNetWorth(mineCoin,userperiod);
+
         for (uint256 i=0;i<_maxLoop;i++){
             if(userperiod > nowIndex){
                 break;
             }
-            uint256 _totalDistri = getTotalDistribution(userperiod);
-            uint256 userDistri = userPeriodDistribution(account,userperiod);
-            if (_totalDistri == 0 || userDistri == 0){
+            if (totalDistribution == 0){
                 break;
             }
             netWorth = getPeriodNetWorth(mineCoin,userperiod,netWorth);
@@ -291,12 +285,11 @@ contract fixedMinePool is fixedMinePoolData {
             if(periodID > curPeriod){
                 latestTime = getPeriodFinishTime(periodID-1);
             }
-            uint256 _totalDistri = getTotalDistribution(periodID);
-            if (_totalDistri == 0){
+            if (totalDistribution == 0){
                 return preNetWorth;
             }
             uint256 periodMind = _getPeriodMined(mineCoin,periodID,finishTime.sub(latestTime));
-            return preNetWorth.add(periodMind.mul(calDecimals)/_totalDistri);
+            return preNetWorth.add(periodMind.mul(calDecimals)/totalDistribution);
         }
     }
     /**
@@ -307,8 +300,7 @@ contract fixedMinePool is fixedMinePoolData {
         uint256 curIndex = getPeriodIndex(latestTime);
         uint256 latestMined = 0;
         for (uint256 i=0;i<50;i++){
-            uint256 _totalDistri = getTotalDistribution(curIndex);
-            if (_totalDistri == 0){
+            if (totalDistribution == 0){
                 break;
             }
             uint256 finishTime = getPeriodFinishTime(curIndex);
@@ -325,8 +317,7 @@ contract fixedMinePool is fixedMinePoolData {
     }
     function _getPeriodMined(address mineCoin,uint256 periodID,uint256 mintTime)internal view returns(uint256){
         uint256 _mineInterval = mineInfoMap[mineCoin].mineInterval;
-        uint256 totalDistri = getTotalDistribution(periodID);
-        if (totalDistri > 0 && _mineInterval>0){
+        if (totalDistribution > 0 && _mineInterval>0){
             uint256 _mineAmount = mineInfoMap[mineCoin].mineAmount;
             mintTime = mintTime/_mineInterval;
             uint256 latestMined = _mineAmount.mul(mintTime);
@@ -335,9 +326,8 @@ contract fixedMinePool is fixedMinePoolData {
         return 0;
     }
     function _getPeriodWeightMined(address mineCoin,uint256 periodID,uint256 mintTime)internal view returns(uint256){
-        uint256 totalDistri = getTotalDistribution(periodID);
-        if (totalDistri > 0){
-            return _getPeriodMined(mineCoin,periodID,mintTime).mul(getweightDistribution(periodID)).div(totalDistri);
+        if (totalDistribution > 0){
+            return _getPeriodMined(mineCoin,periodID,mintTime).mul(getweightDistribution(periodID)).div(totalDistribution);
         }
         return 0;
     }
@@ -351,7 +341,7 @@ contract fixedMinePool is fixedMinePoolData {
         uint256 origin = userInfoMap[account].minerOrigins[mineCoin];
         uint256 userMaxPeriod = userInfoMap[account].maxPeriodID;
         require(tokenNetWorth>=origin,"error: tokenNetWorth logic error!");
-        return userPeriodDistribution(account,periodID).mul(tokenNetWorth-origin).mul(getPeriodWeight(periodID,userMaxPeriod))/1000/calDecimals;
+        return userInfoMap[account].distribution.mul(tokenNetWorth-origin).mul(getPeriodWeight(periodID,userMaxPeriod))/1000/calDecimals;
     }
     function stakeFPTA(uint256 amount)public nonReentrant notHalted{
         amount = getPayableAmount(_FPTA,amount);
@@ -439,61 +429,42 @@ contract fixedMinePool is fixedMinePoolData {
             _mineSettlement(whiteList[i]);
             _settleUserMine(whiteList[i],account);
         }
-        (uint256 fptADistri,uint256 fptBDistri) = calculateDistribution(account);
-        if (userInfoMap[account].maxPeriodID == 0){
-            //flexible mined
-            FPTBFlexibleDistribution = FPTBFlexibleDistribution.sub(fptBDistri);
-        }else{
-            uint256 nowId = getPeriodIndex(currentTime());
-            uint256 endId = userInfoMap[account].maxPeriodID;
-            for(;nowId<=endId;nowId++){
-                totalDistributionMap[nowId] = totalDistributionMap[nowId].sub(fptBDistri);
-                weightDistributionMap[nowId] = weightDistributionMap[nowId].add(fptADistri).sub(fptADistri.add(fptBDistri).mul(getPeriodWeight(nowId,endId))/1000);
-            }
+        uint256 distri = calculateDistribution(account);
+        totalDistribution = totalDistribution.sub(distri);
+        uint256 nowId = getPeriodIndex(currentTime());
+        uint256 endId = userInfoMap[account].maxPeriodID;
+        for(;nowId<=endId;nowId++){
+            weightDistributionMap[nowId] = weightDistributionMap[nowId].sub(distri.mul(getPeriodWeight(nowId,endId)-1000)/1000);
         }
-        FPTADistribution = FPTADistribution.sub(fptADistri);
+        userInfoMap[account].distribution =  0;
         removePremiumDistribution(account);
     }
     function addDistribution(address account) internal {
-        (uint256 fptADistri,uint256 fptBDistri) = calculateDistribution(account);
+        uint256 distri = calculateDistribution(account);
         if (userInfoMap[account].maxPeriodID == 0){
             //flexible mined
-            FPTBFlexibleDistribution = FPTBFlexibleDistribution.add(fptBDistri);
             userInfoMap[account].lockedExpired = currentTime().add(_flexibleExpired);
         }else{
             uint256 nowId = getPeriodIndex(currentTime());
             uint256 endId = userInfoMap[account].maxPeriodID;
             for(;nowId<=endId;nowId++){
-                totalDistributionMap[nowId] = totalDistributionMap[nowId].add(fptBDistri);
-                weightDistributionMap[nowId] = weightDistributionMap[nowId].add(fptADistri.add(fptBDistri).mul(getPeriodWeight(nowId,endId))/1000).sub(fptADistri);
+                weightDistributionMap[nowId] = weightDistributionMap[nowId].add(distri.mul(getPeriodWeight(nowId,endId)-1000)/1000);
             }
             userInfoMap[account].lockedExpired = getPeriodFinishTime(endId);
         }
-        FPTADistribution = FPTADistribution.add(fptADistri);
+        userInfoMap[account].distribution =  distri;
+        totalDistribution = totalDistribution.add(distri);
         addPremiumDistribution(account);
     }
-    function userPeriodDistribution(address account,uint256 periodID)internal view returns (uint256){
-        (uint256 fptADistri,uint256 fptBDistri) = calculateDistribution(account);
-        if(userInfoMap[account].maxPeriodID == 0 || userInfoMap[account].maxPeriodID >= periodID){
-            return fptADistri.add(fptBDistri);
-        }else{
-            //expired
-            return fptADistri;
-        }
-    }
-    function calculateDistribution(address account) internal view returns (uint256,uint256){
+    function calculateDistribution(address account) internal view returns (uint256){
         uint256 fptAAmount = userInfoMap[account]._FPTABalance;
         uint256 fptBAmount = userInfoMap[account]._FPTBBalance;
         uint256 repeat = (fptAAmount>fptBAmount) ? fptBAmount : fptAAmount;
-        uint256 distribution = _FPTBRatio.mul(fptBAmount).add(
+        return _FPTARatio.mul(fptAAmount).add(_FPTBRatio.mul(fptBAmount)).add(
             _RepeatRatio.mul(repeat));
-        return (_FPTARatio.mul(fptAAmount),distribution);
     }
     function getweightDistribution(uint256 periodID)internal view returns (uint256) {
-        return weightDistributionMap[periodID].add(FPTADistribution).add(FPTBFlexibleDistribution);
-    }
-    function getTotalDistribution(uint256 periodID)internal view returns (uint256) {
-        return totalDistributionMap[periodID].add(FPTADistribution).add(FPTBFlexibleDistribution);
+        return weightDistributionMap[periodID].add(totalDistribution);
     }
     function getPeriodWeight(uint256 currentID,uint256 maxPeriod) internal pure returns (uint256) {
         if (maxPeriod == 0 || currentID > maxPeriod){

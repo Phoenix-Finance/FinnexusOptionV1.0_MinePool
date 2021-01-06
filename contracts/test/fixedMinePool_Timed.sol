@@ -20,26 +20,16 @@ contract fixedMinePool_Timed is fixedMinePool {
     function setTime(uint256 _time) public{
         _timeAccumulation = _time;
     }
-    function getFPTBFlexibleDistribution() public view returns (uint256){
-        return FPTBFlexibleDistribution;
-    }
-    function getFPTADistribution() public view returns (uint256){
-        return FPTADistribution;
-    }
-    function getCurrentPeriodDistribution() public view returns (uint256){
-        uint256 nowId = getPeriodIndex(currentTime());
-        return totalDistributionMap[nowId];
-    }
-    function getPeriodDistribution(uint256 periodId) public view returns (uint256){
-        return totalDistributionMap[periodId];
+    function getTotalDistribution() public view returns (uint256){
+        return totalDistribution;
     }
     function getPeriodWeightDistribution(uint256 periodId) public view returns (uint256){
         return weightDistributionMap[periodId];
     }
-    function getUserDistribution(address account,uint256 periodId) public view returns (uint256){
-        return userPeriodDistribution(account,periodId);
+    function getUserDistribution(address account) public view returns (uint256){
+        return userInfoMap[account].distribution;
     }
-    function getDistributionCal(address account) public view returns (uint256,uint256){
+    function getDistributionCal(address account) public view returns (uint256){
         return calculateDistribution(account);
     }
     function getTokenNetWorth(address mineCoin,uint256 periodID)public view returns(uint256){

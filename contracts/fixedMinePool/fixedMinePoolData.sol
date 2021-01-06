@@ -37,13 +37,13 @@ contract fixedMinePoolData is once,Halt,AddressWhiteList,ReentrancyGuard {
         uint256 _FPTABalance;
         uint256 _FPTBBalance;
         uint256 maxPeriodID;
-
+        uint256 lockedExpired;
+        uint256 distribution;
         mapping(address=>uint256) minerBalances;
         mapping(address=>uint256) minerOrigins;
         //user's max locked period id.
         //user's latest settlement period for each token.
         mapping(address=>uint256) settlePeriod;
-        uint256 lockedExpired;
     }
     struct tokenMineInfo {
         uint256 mineAmount;
@@ -57,10 +57,8 @@ contract fixedMinePoolData is once,Halt,AddressWhiteList,ReentrancyGuard {
 
     mapping(address=>userInfo) internal userInfoMap;
     mapping(address=>tokenMineInfo) internal mineInfoMap;
-    mapping(uint256=>uint256) internal totalDistributionMap;
     mapping(uint256=>uint256) internal weightDistributionMap;
-    uint256 internal FPTBFlexibleDistribution;
-    uint256 internal FPTADistribution;
+    uint256 internal totalDistribution;
 
     struct premiumMined {
         uint256 totalPremiumDistribution;
