@@ -107,6 +107,7 @@ contract fixedMinePoolData is initializable,Halt,AddressWhiteList,ReentrancyGuar
     mapping(uint256=>premiumMined) internal premiumMinedMap;
     //user's latest redeemed period index in the distributedPeriod list.
     mapping(address=>uint256) internal userLastPremiumIndex;
+    mapping(address=>uint256) internal userPremiumBalance;
 
     /**
      * @dev Emitted when `account` stake `amount` FPT-A coin.

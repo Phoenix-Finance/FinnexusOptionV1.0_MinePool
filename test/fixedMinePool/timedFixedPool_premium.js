@@ -81,13 +81,20 @@ contract('fixedMinePool_Timed', function (accounts){
         await minePool.distributePremium(4,10000);
         mineBalance = await minePool.getUserLatestPremium(accounts[0]);
         assert(Math.abs(mineBalance.toNumber()-realMine)<10,"getUserLatestPremium error");
+        bErr = false;
+        try {
+            await minePool.redeemPremium(15000);    
+        } catch (error) {
+            bErr = true;
+        }
+        assert(bErr,"redeemPremium error");
         let Balance0 = await USDC.balanceOf(minePool.address); 
-        await minePool.redeemPremium(mineBalance);
+        await minePool.redeemPremium(5000);
         let Balance1 = await USDC.balanceOf(minePool.address); 
-        assert.equal(mineBalance.toNumber(),Balance0.toNumber()-Balance1.toNumber(),"redeemPremium error");
+        assert.equal(mineBalance.toNumber()-5000,Balance0.toNumber()-Balance1.toNumber(),"redeemPremium error");
         await minePool.distributePremium(3,10000);
         mineBalance = await minePool.getUserLatestPremium(accounts[0]);
-        assert.equal(mineBalance.toNumber(),0,"getMinerBalance error");
+        assert(Math.abs(mineBalance.toNumber()-5000)<10,"getUserLatestPremium error");
     });
     it('fixedMinePool_Timed two persons Premium', async function (){
         let CFNXA = await CFNX.new();
