@@ -64,7 +64,7 @@ exports.migrateTimedMinePool =  async function (accounts){
     }
 }
 function calculateDistribution(fptA,fptB){
-    return (fptA+fptB+Math.min(fptA,fptB)*20)*1000;
+    return (fptA+fptB+Math.min(fptA,fptB*10)*20)*1000;
 }
 function calculateWeightDistribution(distribution,getId,maxId){
     if (getId > maxId){

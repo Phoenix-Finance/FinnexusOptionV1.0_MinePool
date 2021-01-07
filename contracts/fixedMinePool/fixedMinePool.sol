@@ -497,7 +497,7 @@ contract fixedMinePool is fixedMinePoolData {
     function calculateDistribution(address account) internal view returns (uint256){
         uint256 fptAAmount = userInfoMap[account]._FPTABalance;
         uint256 fptBAmount = userInfoMap[account]._FPTBBalance;
-        uint256 repeat = (fptAAmount>fptBAmount) ? fptBAmount : fptAAmount;
+        uint256 repeat = (fptAAmount>fptBAmount*10) ? fptBAmount*10 : fptAAmount;
         return _FPTARatio.mul(fptAAmount).add(_FPTBRatio.mul(fptBAmount)).add(
             _RepeatRatio.mul(repeat));
     }
@@ -508,7 +508,7 @@ contract fixedMinePool is fixedMinePoolData {
         if (maxPeriod == 0 || currentID > maxPeriod){
             return 1000;
         }
-        return maxPeriod.sub(currentID).mul(periodWeight) +5000;
+        return maxPeriod.sub(currentID).mul(periodWeight) +baseWeight;
     }
 
        /**
@@ -581,13 +581,18 @@ contract fixedMinePool is fixedMinePoolData {
         uint256 nowId = getPeriodIndex(beginTime);
         uint256 endId = userInfoMap[account].maxPeriodID;
         uint256 FPTBBalance = userInfoMap[account]._FPTBBalance;
-        for(;nowId<endId;nowId++){
-            uint256 finishTime = getPeriodFinishTime(nowId);
-            uint256 periodDistribution = finishTime.sub(beginTime).mul(FPTBBalance);
-            premiumMinedMap[nowId].totalPremiumDistribution = premiumMinedMap[nowId].totalPremiumDistribution.sub(periodDistribution);
-            premiumMinedMap[nowId].userPremiumDistribution[account] = premiumMinedMap[nowId].userPremiumDistribution[account].sub(periodDistribution);
-            beginTime = finishTime;
+        if (FPTBBalance> 0 && nowId<endId){
+            for(;nowId<endId;nowId++){
+                uint256 finishTime = getPeriodFinishTime(nowId);
+                uint256 periodDistribution = finishTime.sub(beginTime).mul(FPTBBalance);
+                premiumMinedMap[nowId].totalPremiumDistribution = premiumMinedMap[nowId].totalPremiumDistribution.sub(periodDistribution);
+                premiumMinedMap[nowId].userPremiumDistribution[account] = premiumMinedMap[nowId].userPremiumDistribution[account].sub(periodDistribution);
+                beginTime = finishTime;
+            }
+        }else{
+            userLastPremiumIndex[msg.sender] = distributedPeriod.length;
         }
+
     }
     function addPremiumDistribution(address account) internal {
         uint256 beginTime = currentTime(); 

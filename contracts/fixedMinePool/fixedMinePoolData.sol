@@ -37,6 +37,7 @@ contract fixedMinePoolData is initializable,Halt,AddressWhiteList,ReentrancyGuar
     uint256 constant internal _RepeatRatio = 20000;
     //the accumulated weight each period has.
     uint256 constant internal periodWeight = 1000;
+    uint256 constant internal baseWeight = 5000;
 
     //options premium address.
     address internal _premium;

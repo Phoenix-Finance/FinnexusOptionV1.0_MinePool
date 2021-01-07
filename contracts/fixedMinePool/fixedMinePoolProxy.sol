@@ -29,6 +29,62 @@ contract fixedMinePoolProxy is newBaseProxy {
     function()external payable{
 
     }
+        /**
+     * @dev Returns the address of the current owner.
+     */
+    function owner() public view returns (address) {
+        delegateToViewAndReturn(); 
+    }
+    /**
+     * @dev Returns true if the caller is the current owner.
+     */
+    function isOwner() public view returns (bool) {
+        delegateToViewAndReturn(); 
+    }
+    /**
+     * @dev Leaves the contract without owner. It will not be possible to call
+     * `onlyOwner` functions anymore. Can only be called by the current owner.
+     *
+     * NOTE: Renouncing ownership will leave the contract without an owner,
+     * thereby removing any functionality that is only available to the owner.
+     */
+    function renounceOwnership() public {
+        delegateAndReturn();
+    }
+    /**
+     * @dev Transfers ownership of the contract to a new account (`newOwner`).
+     * Can only be called by the current owner.
+     */
+    function transferOwnership(address /*newOwner*/) public {
+        delegateAndReturn();
+    }
+    function setHalt(bool /*halt*/) public  {
+        delegateAndReturn();
+    }
+     function addWhiteList(address /*addAddress*/)public{
+        delegateAndReturn();
+    }
+    /**
+     * @dev Implementation of revoke an invalid address from the whitelist.
+     *  removeAddress revoked address.
+     */
+    function removeWhiteList(address /*removeAddress*/)public returns (bool){
+        delegateAndReturn();
+    }
+    /**
+     * @dev Implementation of getting the eligible whitelist.
+     */
+    function getWhiteList()public view returns (address[] memory){
+        delegateToViewAndReturn();
+    }
+    /**
+     * @dev Implementation of testing whether the input address is eligible.
+     *  tmpAddress input address for testing.
+     */    
+    function isEligibleAddress(address /*tmpAddress*/) public view returns (bool){
+        delegateToViewAndReturn();
+    }
+
     function setFPTAAddress(address /*FPTA*/) public {
         delegateAndReturn();
     }
