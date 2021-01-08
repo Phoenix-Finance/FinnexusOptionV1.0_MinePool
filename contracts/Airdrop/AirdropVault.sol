@@ -38,34 +38,26 @@ contract AirDropVault is AirDropVaultData {
         ftpbToken = _ftpbToken;
     }
     
-    function setTotalAirdropFnx(uint256 _totalAirdropFnx) public onlyOwner {
-        totalAirdropFnx = _totalAirdropFnx;
-    }
-
-    function setFnxPerPerson(uint256 _fnxPerPerson)  public onlyOwner {
-        fnxPerPerson = _fnxPerPerson;
-    }
-    
     /**
      * @dev getting back the left mine token
-     * @param reciever the reciever for getting back mine token
+     * @param _reciever the reciever for getting back mine token
      */
-    function getbackLeftFnx(address reciever)  public onlyOwner {
+    function getbackLeftFnx(address _reciever)  public onlyOwner {
         uint256 bal =  IERC20(fnxToken).balanceOf(address(this));
-        IERC20(fnxToken).transfer(reciever,bal);
+        IERC20(fnxToken).transfer(_reciever,bal);
     }  
 
     /**
      * @dev Retrieve user's locked balance. 
-     * @param account user's account.
+     * @param _account user's account.
      */ 
-    function balanceOfAirdrop(address account) public view returns (uint256) {
-        return airDropWhiteList[account];
+    function balanceOfAirdrop(address _account) public view returns (uint256) {
+        return airDropWhiteList[_account];
     }
 
 
-    function addWhiteList(address account) external {
-        airDropWhiteList[account] = fnxPerPerson;
+    function addWhiteList(address _account,uint256 _fnxnumber) public onlyOperator() {
+        airDropWhiteList[_account] = _fnxnumber;
     }
     
     
@@ -74,8 +66,6 @@ contract AirDropVault is AirDropVaultData {
         require(minePool!=address(0),"mine pool address should be set");
         require(fnxToken!=address(0),"fnx token address should be set");
         require(ftpbToken!=address(0),"ftpb token address should be set");
-        require(totalAirdropFnx!=0,"total airdrop number should be set");
-        require(fnxPerPerson!=0,"air drop number for each person should be set");
         require(airDropWhiteList[tx.origin]>0,"claimer should be in whitelist");
 
         uint256 amount = airDropWhiteList[tx.origin];
