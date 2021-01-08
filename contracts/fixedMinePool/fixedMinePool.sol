@@ -244,7 +244,7 @@ contract fixedMinePool is fixedMinePoolData {
     function _mineSettlementPeriod(address mineCoin,uint256 periodID,uint256 mineTime)internal{
         uint256 totalDistri = totalDistribution;
         if (totalDistri > 0){
-            uint256 latestMined = _getPeriodMined(mineCoin,periodID,mineTime);
+            uint256 latestMined = _getPeriodMined(mineCoin,mineTime);
             if (latestMined>0){
                 mineInfoMap[mineCoin].minedNetWorth = mineInfoMap[mineCoin].minedNetWorth.add(latestMined.mul(calDecimals)/totalDistri);
                 mineInfoMap[mineCoin].totalMinedCoin = mineInfoMap[mineCoin].totalMinedCoin.add(latestMined.mul(
@@ -335,7 +335,7 @@ contract fixedMinePool is fixedMinePoolData {
             if (totalDistribution == 0){
                 return preNetWorth;
             }
-            uint256 periodMind = _getPeriodMined(mineCoin,periodID,finishTime.sub(latestTime));
+            uint256 periodMind = _getPeriodMined(mineCoin,finishTime.sub(latestTime));
             return preNetWorth.add(periodMind.mul(calDecimals)/totalDistribution);
         }
     }
@@ -362,7 +362,7 @@ contract fixedMinePool is fixedMinePoolData {
         }
         return latestMined;
     }
-    function _getPeriodMined(address mineCoin,uint256 periodID,uint256 mintTime)internal view returns(uint256){
+    function _getPeriodMined(address mineCoin,uint256 mintTime)internal view returns(uint256){
         uint256 _mineInterval = mineInfoMap[mineCoin].mineInterval;
         if (totalDistribution > 0 && _mineInterval>0){
             uint256 _mineAmount = mineInfoMap[mineCoin].mineAmount;
@@ -374,7 +374,7 @@ contract fixedMinePool is fixedMinePoolData {
     }
     function _getPeriodWeightMined(address mineCoin,uint256 periodID,uint256 mintTime)internal view returns(uint256){
         if (totalDistribution > 0){
-            return _getPeriodMined(mineCoin,periodID,mintTime).mul(getweightDistribution(periodID)).div(totalDistribution);
+            return _getPeriodMined(mineCoin,mintTime).mul(getweightDistribution(periodID)).div(totalDistribution);
         }
         return 0;
     }
@@ -384,7 +384,7 @@ contract fixedMinePool is fixedMinePoolData {
      * @param account user's account
      * @param tokenNetWorth the latest token net worth
      */
-    function _settlement(address mineCoin,address account,uint256 periodID,uint256 tokenNetWorth)internal returns (uint256) {
+    function _settlement(address mineCoin,address account,uint256 periodID,uint256 tokenNetWorth)internal view returns (uint256) {
         uint256 origin = userInfoMap[account].minerOrigins[mineCoin];
         uint256 userMaxPeriod = userInfoMap[account].maxPeriodID;
         require(tokenNetWorth>=origin,"error: tokenNetWorth logic error!");
@@ -567,7 +567,7 @@ contract fixedMinePool is fixedMinePoolData {
         return 0;
     }
 
-    function distributePremium(uint256 periodID,uint256 amount)public onlyOwner {
+    function distributePremium(uint256 periodID,uint256 amount)public onlyOperator(0) {
         amount = getPayableAmount(_premium,amount);
         require(amount > 0, 'Distribution amount is zero');
         require(premiumMinedMap[periodID].totalMined == 0 , "This period is already distributed!");

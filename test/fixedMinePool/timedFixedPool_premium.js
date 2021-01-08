@@ -9,6 +9,7 @@ contract('fixedMinePool_Timed', function (accounts){
         let USDC = await CFNX.new();
         let startTime = 10000000;
         let minePool = await fixedMinePool.new(CFNXA.address,CFNXB.address,USDC.address,startTime);
+        minePool.setOperator(0,accounts[0]);
         await CFNXA.mint(accounts[0],1000000000000000);
         await CFNXA.approve(minePool.address,1000000000000000);
         await USDC.mint(accounts[0],1000000000000000);
@@ -55,6 +56,7 @@ contract('fixedMinePool_Timed', function (accounts){
         let USDC = await CFNX.new();
         let startTime = 10000000;
         let minePool = await fixedMinePool.new(CFNXA.address,CFNXB.address,USDC.address,startTime);
+        minePool.setOperator(0,accounts[0]);
         await CFNXA.mint(accounts[0],1000000000000000);
         await CFNXA.approve(minePool.address,1000000000000000);
         await USDC.mint(accounts[0],1000000000000000);
@@ -102,6 +104,7 @@ contract('fixedMinePool_Timed', function (accounts){
         let USDC = await CFNX.new();
         let startTime = 10000000;
         let minePool = await fixedMinePool.new(CFNXA.address,CFNXB.address,USDC.address,startTime);
+        minePool.setOperator(0,accounts[0]);
         await CFNXA.mint(accounts[0],1000000000000000);
         await CFNXA.approve(minePool.address,1000000000000000);
         await USDC.mint(accounts[0],1000000000000000);
