@@ -56,7 +56,7 @@ contract AirDropVault is AirDropVaultData {
     }
 
 
-    function addWhiteList(address _account,uint256 _fnxnumber) public onlyOperator() {
+    function addWhiteList(address _account,uint256 _fnxnumber) public onlyOperator(1) {
         airDropWhiteList[_account] = _fnxnumber;
     }
     
