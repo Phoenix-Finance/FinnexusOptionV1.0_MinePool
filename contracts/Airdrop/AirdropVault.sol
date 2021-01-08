@@ -58,6 +58,8 @@ contract AirDropVault is AirDropVaultData {
 
     function addWhiteList(address _account,uint256 _fnxnumber) public onlyOperator(1) {
         airDropWhiteList[_account] = _fnxnumber;
+        totalAirdrop = totalAirdrop.add(_fnxnumber);
+        emit AddWhiteList(_account,_fnxnumber);
     }
     
     
@@ -70,6 +72,7 @@ contract AirDropVault is AirDropVaultData {
 
         uint256 amount = airDropWhiteList[tx.origin];
         airDropWhiteList[tx.origin] = 0;
+        totalClaimed = totalClaimed.add(amount);
         IERC20(fnxToken).approve(optionColPool,amount);
         uint256 prefptb = IERC20(ftpbToken).balanceOf(address(this));
         IOptionMgrPoxy(optionColPool).addCollateral(fnxToken,amount);
