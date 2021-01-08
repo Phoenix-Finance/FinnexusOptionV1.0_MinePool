@@ -28,14 +28,7 @@ contract AirDropVaultProxy is AirDropVaultData,baseProxy {
         delegateAndReturn();
     }
     
-    function setTotalAirdropFnx(uint256 /*_totalAirdropFnx*/) public  {
-        delegateAndReturn();
-    }
 
-    function setFnxPerPerson(uint256 /*_fnxPerPerson*/)  public  {
-        delegateAndReturn();
-    }
-    
     function getbackLeftFnx(address /*reciever*/)  public  {
         delegateAndReturn();
     }  
@@ -46,7 +39,7 @@ contract AirDropVaultProxy is AirDropVaultData,baseProxy {
     }
 
 
-    function addWhiteList(address /*account*/) external {
+    function addWhiteList(address/*_account*/,uint256 /*_fnxnumber*/) public {
         delegateAndReturn();
     }
     
