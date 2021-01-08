@@ -5,6 +5,7 @@ pragma solidity =0.5.16;
  * Copyright (C) 2020 FinNexus Options Protocol
  */
 import "../modules/Halt.sol";
+import "../modules/Operator.sol";
 import "../modules/AddressWhiteList.sol";
 import "../modules/ReentrancyGuard.sol";
 import "../modules/initializable.sol";
@@ -14,7 +15,7 @@ import "../modules/initializable.sol";
  *      Users who both stake some FPT-A and FPT-B coins will get more bonus in mine pool.
  *      Users who Lock FPT-B coins will get several times than normal miners.
  */
-contract fixedMinePoolData is initializable,Halt,AddressWhiteList,ReentrancyGuard {
+contract fixedMinePoolData is initializable,Operator,Halt,AddressWhiteList,ReentrancyGuard {
     //Special decimals for calculation
     uint256 constant calDecimals = 1e18;
 

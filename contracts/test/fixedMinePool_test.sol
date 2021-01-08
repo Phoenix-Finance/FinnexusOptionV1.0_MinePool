@@ -14,9 +14,8 @@ import "../fixedMinePool/fixedMinePool.sol";
 contract fixedMinePool_test is fixedMinePool {
     using SafeMath for uint256;
     constructor(address FPTA,address FPTB,address USDC,uint256 startTime)public fixedMinePool(FPTA,FPTB,USDC,startTime){
-    }function getTotalDistribution() public view returns (uint256){
-        return totalDistribution;
     }
+
     function getPeriodWeightDistribution(uint256 periodId) public view returns (uint256){
         return weightDistributionMap[periodId];
     }

@@ -62,6 +62,16 @@ contract('fixedMinePool', function (accounts){
         contractBalance = await contracts.CFNXA.balanceOf(contracts.minePool.address);
         assert.equal(contractBalance.toNumber(),0,"getUserFPTABalance Error");
         await checkUserDistribution(contracts,accounts[0]);
+        await contracts.minePool.setOperator(1,accounts[1]);
+        await contracts.minePool.lockAirDrop(accounts[2],1000000,{from:accounts[1]});
+        contractBalance = await contracts.CFNXB.balanceOf(contracts.minePool.address);
+        assert.equal(contractBalance.toNumber(),1000000,"getUserFPTABalance Error");
+        fptA = await contracts.minePool.getUserFPTABalance(accounts[2]);
+        assert.equal(fptA.toNumber(),0,"getUserFPTABalance Error");
+        fptB = await contracts.minePool.getUserFPTBBalance(accounts[2]);
+        assert.equal(fptB.toNumber(),1000000,"getUserFPTABalance Error");
+        fptB = await contracts.minePool.getUserFPTBBalance(accounts[1]);
+        assert.equal(fptB.toNumber(),0,"getUserFPTABalance Error");
     });
     it('fixedMinePool flexible stake FPTB function', async function (){
         let contracts = await migrateTestMinePool(accounts);

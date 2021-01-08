@@ -117,6 +117,8 @@ contract('fixedMinePool', function (accounts){
         netWorth = await contracts.minePool.getTokenNetWorth(contracts.MINE.address,nowId);
         settleTime = await contracts.minePool.getMinerBalance(accounts[0],contracts.MINE.address);
         console.log("getTokenNetWorth : ",netWorth.toString(),settleTime.toString());
+        let apy = await contracts.minePool.getUserCurrentAPY(accounts[0],contracts.MINE.address);
+        assert.equal(apy.toNumber(),378432000000000,"getUserFPTABalance Error");
     });
     it('fixedMinePool Locked stake FPTB function changePeriod', async function (){
         let contracts = await migrateTestMinePool(accounts);

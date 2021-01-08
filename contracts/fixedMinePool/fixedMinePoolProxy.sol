@@ -84,21 +84,17 @@ contract fixedMinePoolProxy is newBaseProxy {
     function isEligibleAddress(address /*tmpAddress*/) public view returns (bool){
         delegateToViewAndReturn();
     }
-
-    function setFPTAAddress(address /*FPTA*/) public {
+    function setOperator(uint256 /*index*/,address /*addAddress*/)public{
         delegateAndReturn();
     }
-    function setFPTBAddress(address /*FPTB*/)public {
-        delegateAndReturn();
+    function getOperator(uint256 /*index*/)public view returns (address) {
+        delegateToViewAndReturn(); 
     }
     function getFPTAAddress()public view returns (address) {
         delegateToViewAndReturn(); 
     }
     function getFPTBAddress()public view returns (address) {
         delegateToViewAndReturn(); 
-    }
-    function setStartTime(uint256 /*startTime*/) public {
-        delegateAndReturn();
     }
     function getStartTime()public view returns (uint256) {
         delegateToViewAndReturn(); 
@@ -116,6 +112,9 @@ contract fixedMinePoolProxy is newBaseProxy {
         delegateToViewAndReturn(); 
     }
     function getUserExpired(address /*account*/)public view returns (uint256) {
+        delegateToViewAndReturn(); 
+    }
+    function getUserCurrentAPY(address /*account*/,address /*mineCoin*/)public view returns (uint256){
         delegateToViewAndReturn(); 
     }
     /**
@@ -167,6 +166,12 @@ contract fixedMinePoolProxy is newBaseProxy {
     function redeemMinerCoin(address /*mineCoin*/,uint256 /*amount*/)public{
         delegateAndReturn();
     }
+    function getMineWeightRatio()public view returns (uint256) {
+        delegateToViewAndReturn(); 
+    }
+    function getTotalDistribution() public view returns (uint256){
+        delegateToViewAndReturn(); 
+    }
     function getPeriodIndex(uint256 /*_time*/) public view returns (uint256) {
         delegateToViewAndReturn(); 
     }
@@ -215,4 +220,42 @@ contract fixedMinePoolProxy is newBaseProxy {
     function distributePremium(uint256 /*periodID*/,uint256 /*amount*/)public {
         delegateAndReturn();
     }
+        /**
+     * @dev Emitted when `account` stake `amount` FPT-A coin.
+     */
+    event StakeFPTA(address indexed account,uint256 amount);
+    /**
+     * @dev Emitted when `from` airdrop `recieptor` `amount` FPT-B coin.
+     */
+    event LockAirDrop(address indexed from,address indexed recieptor,uint256 amount);
+    /**
+     * @dev Emitted when `account` stake `amount` FPT-B coin and locked `lockedPeriod` periods.
+     */
+    event StakeFPTB(address indexed account,uint256 amount,uint256 lockedPeriod);
+    /**
+     * @dev Emitted when `account` unstake `amount` FPT-A coin.
+     */
+    event UnstakeFPTA(address indexed account,uint256 amount);
+    /**
+     * @dev Emitted when `account` unstake `amount` FPT-B coin.
+     */
+    event UnstakeFPTB(address indexed account,uint256 amount);
+    /**
+     * @dev Emitted when `account` change `lockedPeriod` locked periods for FPT-B coin.
+     */
+    event ChangeLockedPeriod(address indexed account,uint256 lockedPeriod);
+    /**
+     * @dev Emitted when owner `account` distribute `amount` premium in `periodID` period.
+     */
+    event DistributePremium(address indexed account,uint256 indexed periodID,uint256 amount);
+    /**
+     * @dev Emitted when `account` redeem `amount` premium.
+     */
+    event RedeemPremium(address indexed account,uint256 amount);
+
+    /**
+     * @dev Emitted when `account` redeem `value` mineCoins.
+     */
+    event RedeemMineCoin(address indexed account, address indexed mineCoin, uint256 value);
+
 }

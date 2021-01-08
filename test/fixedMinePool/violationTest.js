@@ -6,6 +6,9 @@ const {migrateNormalMinePool} = require("./testFunctions.js")
 contract('fixedMinePool', function (accounts){
     it('fixedMinePool Locked stake FPTB function', async function (){
         let contracts = await migrateNormalMinePool(accounts);
+        await testViolation("msg.sender is not Owner",async function(){
+            await contracts.minePool.redeemOut(contracts.CFNXA.adddress,10000000,{from:accounts[1]});
+        });
         await testViolation("stake FPTB imput error period",async function(){
             await contracts.minePool.stakeFPTB(1000000,13);
         });
@@ -17,6 +20,9 @@ contract('fixedMinePool', function (accounts){
         });
         await testViolation("unstake FPTB balance is insufficient",async function(){
             await contracts.minePool.unstakeFPTB(1000000);
+        });
+        await testViolation("lockAirDrop FPTB is not operator",async function(){
+            await contracts.minePool.lockAirDrop(accounts[1],1000000);
         });
         await contracts.minePool.stakeFPTB(1000000,0);
         await testViolation("unstake FPTB before expired time",async function(){

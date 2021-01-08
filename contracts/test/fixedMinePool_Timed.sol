@@ -23,9 +23,6 @@ contract fixedMinePool_Timed is fixedMinePool {
     function setTime(uint256 _time) public{
         _timeAccumulation = _time;
     }
-    function getTotalDistribution() public view returns (uint256){
-        return totalDistribution;
-    }
     function getPeriodWeightDistribution(uint256 periodId) public view returns (uint256){
         return weightDistributionMap[periodId];
     }

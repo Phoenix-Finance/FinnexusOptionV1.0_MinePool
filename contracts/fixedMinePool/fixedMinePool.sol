@@ -55,20 +55,11 @@ contract fixedMinePool is fixedMinePoolData {
         _premium = USDC;
         _startTime = startTime;
     }
-    function setFPTAAddress(address FPTA)onlyOwner public {
-        _FPTA = FPTA;
-    }
-    function setFPTBAddress(address FPTB)onlyOwner public {
-        _FPTB = FPTB;
-    }
     function getFPTAAddress()public view returns (address) {
         return _FPTA;
     }
     function getFPTBAddress()public view returns (address) {
         return _FPTB;
-    }
-    function setStartTime(uint256 startTime)onlyOwner public {
-        _startTime = startTime;
     }
     function getStartTime()public view returns (uint256) {
         return _startTime;
@@ -98,6 +89,16 @@ contract fixedMinePool is fixedMinePoolData {
     }
     function getUserExpired(address account)public view returns (uint256) {
         return userInfoMap[account].lockedExpired;
+    }
+    function getMineWeightRatio()public view returns (uint256) {
+        if(totalDistribution > 0) {
+            return getweightDistribution(getPeriodIndex(currentTime()))*1000/totalDistribution;
+        }else{
+            return 1000;
+        }
+    }
+    function getTotalDistribution() public view returns (uint256){
+        return totalDistribution;
     }
     /**
      * @dev foundation redeem out mine coins.
@@ -200,6 +201,14 @@ contract fixedMinePool is fixedMinePoolData {
     }
     function getPeriodFinishTime(uint256 periodID)public view returns (uint256) {
         return periodID.mul(_period).add(_startTime);
+    }
+    function getUserCurrentAPY(address account,address mineCoin)public view returns (uint256) {
+        if (totalDistribution == 0 || mineInfoMap[mineCoin].mineInterval == 0){
+            return 0;
+        }
+        uint256 baseMine = mineInfoMap[mineCoin].mineAmount.mul(365 days).mul(
+                userInfoMap[account].distribution)/totalDistribution/mineInfoMap[mineCoin].mineInterval;
+        return baseMine.mul(getPeriodWeight(getPeriodIndex(currentTime()),userInfoMap[account].maxPeriodID))/1000;
     }
     /**
      * @dev the auxiliary function for _mineSettlementAll.
@@ -389,10 +398,10 @@ contract fixedMinePool is fixedMinePoolData {
         addDistribution(msg.sender);
         emit StakeFPTA(msg.sender,amount);
     }
-    function lockAirDrop(address user,uint256 ftp_b_amount) external{
+    function lockAirDrop(address user,uint256 ftp_b_amount) external onlyOperator(1){
         uint256 curPeriod = getPeriodIndex(currentTime());
         uint256 maxId = userInfoMap[user].maxPeriodID;
-        uint256 lockedPeriod = curPeriod+1 > maxId ? curPeriod+1 : maxId;
+        uint256 lockedPeriod = curPeriod > maxId ? curPeriod : maxId;
         ftp_b_amount = getPayableAmount(_FPTB,ftp_b_amount);
         require(ftp_b_amount > 0, 'stake amount is zero');
         removeDistribution(user);
@@ -505,7 +514,7 @@ contract fixedMinePool is fixedMinePoolData {
     function getweightDistribution(uint256 periodID)internal view returns (uint256) {
         return weightDistributionMap[periodID].add(totalDistribution);
     }
-    function getPeriodWeight(uint256 currentID,uint256 maxPeriod) internal pure returns (uint256) {
+    function getPeriodWeight(uint256 currentID,uint256 maxPeriod) public pure returns (uint256) {
         if (maxPeriod == 0 || currentID > maxPeriod){
             return 1000;
         }
