@@ -134,7 +134,7 @@ contract fixedMinePool is fixedMinePoolData {
     }
     /**
      * @dev An auxiliary foundation which transter amount mine coins to recieptor.
-     * @param address recieptor recieptor's account.
+     * @param recieptor recieptor recieptor's account.
      * @param mineCoin mineCoin address
      * @param amount redeem amount.
      */
@@ -508,7 +508,7 @@ contract fixedMinePool is fixedMinePoolData {
     /**
      * @dev Stake FPT-B coin and lock locedPreiod and get distribution for mining.
      * @param amount FPT-B amount that transfer into mine pool.
-     * @param locedPreiod locked preiod number.
+     * @param lockedPeriod locked preiod number.
      */
     function stakeFPTB(uint256 amount,uint256 lockedPeriod)public validPeriod(lockedPeriod) nonReentrant notHalted{
         uint256 curPeriod = getPeriodIndex(currentTime());
