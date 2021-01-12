@@ -1,6 +1,7 @@
+var User = require('./user.js');
+
 var express = require('express');
 var app = express();
-
 var Web3 = require('web3');
 var web3 = new Web3(new Web3.providers.HttpProvider("https://rinkeby.infura.io/v3/75c431806c0d49ee9868d4fdcef025bd"));
 //var web3 = new Web3(new Web3.providers.HttpProvider("https://mainnet.infura.io/v3/75c431806c0d49ee9868d4fdcef025bd"));
@@ -41,18 +42,36 @@ var previousBlkNum = 0;
 var totalIdx = 0;
 var resultMap = new Map();
 
-//console.log(stakerMap[minepooladdress])
+async function loadFromDB() {
+    let gotblk = await User.getBlockNum();
+    console.log("get block number");
+    console.log(gotblk);
+    if(gotblk!=null) {
+        previousBlkNum = gotblk.blocknumber;
+    }
+
+    let all = await User.findAll();
+    if(all != null) {
+        let i = 0;
+        for (i = 0; i < all.length; i++) {
+            stakerMap[all[i].address] = all[i].value;
+        }
+    }
+
+    console.log(stakerMap);
+}
+
 async function getStakers(blkFrom,blkTo) {
     let i = 0;
     console.log(blkFrom,blkTo);
     try {
         //  event StakeFPTA(address indexed account,uint256 amount);
         const StakeFPTAEvent = await minepool.getPastEvents('StakeFPTA', {fromBlock: blkFrom, toBlock: blkTo});
-        //console.log(StakeFPTAEvent);
         for (i=0; i < StakeFPTAEvent.length; i++) {
             let account = StakeFPTAEvent[i].returnValues.account;
             //console.log(account);
             stakerMap[account] = "OK";
+            User.save(account,stakerMap[account]);
         }
     }catch (e) {
         console.error(e)
@@ -61,12 +80,12 @@ async function getStakers(blkFrom,blkTo) {
     try {
         //event StakeFPTB(address indexed account,uint256 amount,uint256 lockedPeriod);
         const StakeFPTBEvent = await minepool.getPastEvents('StakeFPTB', {fromBlock: blkFrom, toBlock: blkTo});
-        //console.log(StakeFPTBEvent);
         for (i=0; i < StakeFPTBEvent.length; i++) {
             let account = StakeFPTBEvent[i].returnValues.account;
             //console.log(account);
             if (stakerMap[account] == undefined) {
                 stakerMap[account] = "OK";
+                User.save(account,stakerMap[account]);
             }
         }
     }catch (e) {
@@ -76,28 +95,35 @@ async function getStakers(blkFrom,blkTo) {
     try {
         //event LockAirDrop(address indexed from,address indexed recieptor,uint256 amount);
         const LockAirDropEvent = await minepool.getPastEvents('LockAirDrop', {fromBlock: blkFrom, toBlock: blkTo});
-       // console.log(LockAirDropEvent);
         for (i=0; i < LockAirDropEvent.length; i++) {
             let account = LockAirDropEvent[i].returnValues.recieptor;
            // console.log(account);
             if (stakerMap[account] == undefined) {
                 stakerMap[account] = "OK";
+                User.save(account,stakerMap[account]);
             }
         }
     }catch (e) {
         console.error(e)
     }
 
+    User.saveBlockNum(blkTo);
     console.log("GET STAKERS END");
     //console.log(stakerMap);
 
-    for (var key in stakerMap) {
-       // console.log(key);
-    }
+    // for (var key in stakerMap) {
+    //   // User.save(key,stakerMap[key]);
+    // }
+
+    // for (var key in stakerMap) {
+    //     result = await User.find(key);
+    //     //console.log(result);
+    // }
+
 }
 
 async function calculate() {
-   console.log("calculation begin....")
+   console.log("calculation begin....");
    try{
         let minapy = 10000;
         let maxapy = 0;
@@ -114,7 +140,7 @@ async function calculate() {
             if(denominater==0) {
                 continue;
             }
-            let apy = (mineofyear*fnxprice)*100/denominater;
+            let apy = ((mineofyear*fnxprice)*100/denominater).toFixed(2);
 
             if (apy>maxapy) {
                 maxapy = apy;
@@ -154,7 +180,7 @@ async function calculate() {
         }
 
         console.log(minapy,maxapy,avgLockTime);
-        resultMap[totalIdx] = {"min":minapy,"max":maxapy,"avg":avgLockTime};
+        resultMap[totalIdx] = {"minapy":minapy,"maxapy":maxapy,"avglocktime":avgLockTime};
         console.log(resultMap[totalIdx]);
         totalIdx++;
 
@@ -165,8 +191,16 @@ async function calculate() {
 
 async function initScan() {
     console.log("init scan...")
+
+    loadFromDB();
+
     let lastedToBlkNum = await web3.eth.getBlockNumber();
-    await getStakers(initBlkNum,lastedToBlkNum);
+    if(previousBlkNum == 0) {
+        await getStakers(initBlkNum, lastedToBlkNum);
+    } else {
+        await getStakers(previousBlkNum, lastedToBlkNum);
+    }
+
     previousBlkNum = lastedToBlkNum;
 }
 
