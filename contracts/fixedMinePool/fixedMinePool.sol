@@ -55,12 +55,21 @@ contract fixedMinePool is fixedMinePoolData {
         _premium = USDC;
         _startTime = startTime;
     }
+    /**
+     * @dev getting function. Retrieve FPT-A coin's address
+     */
     function getFPTAAddress()public view returns (address) {
         return _FPTA;
     }
+    /**
+     * @dev getting function. Retrieve FPT-B coin's address
+     */
     function getFPTBAddress()public view returns (address) {
         return _FPTB;
     }
+    /**
+     * @dev getting function. Retrieve mine pool's start time.
+     */
     function getStartTime()public view returns (uint256) {
         return _startTime;
     }
@@ -84,12 +93,24 @@ contract fixedMinePool is fixedMinePoolData {
     function getUserFPTBBalance(address account)public view returns (uint256) {
         return userInfoMap[account]._FPTBBalance;
     }
+    /**
+     * @dev getting user's maximium locked period ID.
+     * @param account user's account
+     */
     function getUserMaxPeriodId(address account)public view returns (uint256) {
         return userInfoMap[account].maxPeriodID;
     }
+    /**
+     * @dev getting user's locked expired time. After this time user can unstake FPTB coins.
+     * @param account user's account
+     */
     function getUserExpired(address account)public view returns (uint256) {
         return userInfoMap[account].lockedExpired;
     }
+    /**
+     * @dev getting whole pool's mine production weight ratio.
+     *      Real mine production equals base mine production multiply weight ratio.
+     */
     function getMineWeightRatio()public view returns (uint256) {
         if(totalDistribution > 0) {
             return getweightDistribution(getPeriodIndex(currentTime()))*1000/totalDistribution;
@@ -97,6 +118,9 @@ contract fixedMinePool is fixedMinePoolData {
             return 1000;
         }
     }
+    /**
+     * @dev getting whole pool's mine shared distribution. All these distributions will share base mine production.
+     */
     function getTotalDistribution() public view returns (uint256){
         return totalDistribution;
     }
@@ -108,6 +132,12 @@ contract fixedMinePool is fixedMinePoolData {
     function redeemOut(address mineCoin,uint256 amount)public onlyOwner{
         _redeem(msg.sender,mineCoin,amount);
     }
+    /**
+     * @dev An auxiliary foundation which transter amount mine coins to recieptor.
+     * @param address recieptor recieptor's account.
+     * @param mineCoin mineCoin address
+     * @param amount redeem amount.
+     */
     function _redeem(address payable recieptor,address mineCoin,uint256 amount) internal{
         if (mineCoin == address(0)){
             recieptor.transfer(amount);
@@ -193,15 +223,28 @@ contract fixedMinePool is fixedMinePoolData {
             _mineSettlement(whiteList[i]);
         }
     }
+    /**
+     * @dev convert timestamp to period ID.
+     * @param _time timestamp. 
+     */ 
     function getPeriodIndex(uint256 _time) public view returns (uint256) {
         if (_time<_startTime){
             return 0;
         }
         return _time.sub(_startTime).div(_period)+1;
     }
+    /**
+     * @dev convert period ID to period's finish timestamp.
+     * @param periodID period ID. 
+     */
     function getPeriodFinishTime(uint256 periodID)public view returns (uint256) {
         return periodID.mul(_period).add(_startTime);
     }
+    /**
+     * @dev Calculate user's current APY.
+     * @param account user's account.
+     * @param mineCoin mine coin address
+     */
     function getUserCurrentAPY(address account,address mineCoin)public view returns (uint256) {
         if (totalDistribution == 0 || mineInfoMap[mineCoin].mineInterval == 0){
             return 0;
@@ -212,6 +255,7 @@ contract fixedMinePool is fixedMinePoolData {
     }
     /**
      * @dev the auxiliary function for _mineSettlementAll.
+     * @param mineCoin mine coin address
      */    
     function _mineSettlement(address mineCoin)internal{
         uint256 latestTime = mineInfoMap[mineCoin].latestSettleTime;
@@ -241,6 +285,12 @@ contract fixedMinePool is fixedMinePoolData {
             mineInfoMap[mineCoin].latestSettleTime = currentTime();
         }
     }
+    /**
+     * @dev the auxiliary function for _mineSettlement. Calculate and record a period mine production. 
+     * @param mineCoin mine coin address
+     * @param periodID period time
+     * @param mineTime covered time.
+     */  
     function _mineSettlementPeriod(address mineCoin,uint256 periodID,uint256 mineTime)internal{
         uint256 totalDistri = totalDistribution;
         if (totalDistri > 0){
@@ -253,6 +303,11 @@ contract fixedMinePool is fixedMinePoolData {
         }
         mineInfoMap[mineCoin].periodMinedNetWorth[periodID] = mineInfoMap[mineCoin].minedNetWorth;
     }
+    /**
+     * @dev Calculate and record user's mine production. 
+     * @param mineCoin mine coin address
+     * @param account user's account
+     */  
     function _settleUserMine(address mineCoin,address account) internal {
         uint256 nowIndex = getPeriodIndex(currentTime());
         if(userInfoMap[account].distribution>0){
@@ -272,6 +327,12 @@ contract fixedMinePool is fixedMinePoolData {
         userInfoMap[account].minerOrigins[mineCoin] = _getTokenNetWorth(mineCoin,nowIndex);
         userInfoMap[account].settlePeriod[mineCoin] = nowIndex;
     }
+    /**
+     * @dev the auxiliary function for _settleUserMine. Calculate and record a period mine production. 
+     * @param mineCoin mine coin address
+     * @param account user's account
+     * @param periodID period time
+     */ 
     function _settlementPeriod(address mineCoin,address account,uint256 periodID) internal {
         uint256 tokenNetWorth = _getTokenNetWorth(mineCoin,periodID);
         if (totalDistribution > 0){
@@ -280,12 +341,19 @@ contract fixedMinePool is fixedMinePoolData {
         }
         userInfoMap[account].minerOrigins[mineCoin] = tokenNetWorth;
     }
+    /**
+     * @dev retrieve each period's networth. 
+     * @param mineCoin mine coin address
+     * @param periodID period time
+     */ 
     function _getTokenNetWorth(address mineCoin,uint256 periodID)internal view returns(uint256){
         return mineInfoMap[mineCoin].periodMinedNetWorth[periodID];
     }
 
     /**
-     * @dev the auxiliary function for _mineSettlementAll. Calculate latest time phase distributied mine amount.
+     * @dev the auxiliary function for getMinerBalance. Calculate mine amount during latest time phase.
+     * @param mineCoin mine coin address
+     * @param account user's account
      */ 
     function _getUserLatestMined(address mineCoin,address account)internal view returns(uint256){
         uint256 userDistri = userInfoMap[account].distribution;
@@ -316,6 +384,12 @@ contract fixedMinePool is fixedMinePoolData {
         }
         return latestMined;
     }
+    /**
+     * @dev the auxiliary function for _getUserLatestMined. Calculate token net worth in each period.
+     * @param mineCoin mine coin address
+     * @param periodID Period ID
+     * @param preNetWorth The previous period's net worth.
+     */ 
     function getPeriodNetWorth(address mineCoin,uint256 periodID,uint256 preNetWorth) internal view returns(uint256) {
         uint256 latestTime = mineInfoMap[mineCoin].latestSettleTime;
         uint256 curPeriod = getPeriodIndex(latestTime);
@@ -340,7 +414,8 @@ contract fixedMinePool is fixedMinePoolData {
         }
     }
     /**
-     * @dev the auxiliary function for _mineSettlementAll. Calculate latest time phase distributied mine amount.
+     * @dev the auxiliary function for getTotalMined. Calculate mine amount during latest time phase .
+     * @param mineCoin mine coin address
      */ 
     function _getLatestMined(address mineCoin)internal view returns(uint256){
         uint256 latestTime = mineInfoMap[mineCoin].latestSettleTime;
@@ -362,6 +437,11 @@ contract fixedMinePool is fixedMinePoolData {
         }
         return latestMined;
     }
+    /**
+     * @dev Calculate mine amount
+     * @param mineCoin mine coin address
+     * @param mintTime mine duration.
+     */ 
     function _getPeriodMined(address mineCoin,uint256 mintTime)internal view returns(uint256){
         uint256 _mineInterval = mineInfoMap[mineCoin].mineInterval;
         if (totalDistribution > 0 && _mineInterval>0){
@@ -372,6 +452,12 @@ contract fixedMinePool is fixedMinePoolData {
         }
         return 0;
     }
+    /**
+     * @dev Calculate mine amount multiply weight ratio in each period.
+     * @param mineCoin mine coin address
+     * @param mineCoin period ID.
+     * @param mintTime mine duration.
+     */ 
     function _getPeriodWeightMined(address mineCoin,uint256 periodID,uint256 mintTime)internal view returns(uint256){
         if (totalDistribution > 0){
             return _getPeriodMined(mineCoin,mintTime).mul(getweightDistribution(periodID)).div(totalDistribution);
@@ -379,7 +465,7 @@ contract fixedMinePool is fixedMinePoolData {
         return 0;
     }
     /**
-     * @dev subfunction, settle user's latest mine amount.
+     * @dev Auxiliary function, calculate user's latest mine amount.
      * @param mineCoin the mine coin address
      * @param account user's account
      * @param tokenNetWorth the latest token net worth
@@ -390,6 +476,10 @@ contract fixedMinePool is fixedMinePoolData {
         require(tokenNetWorth>=origin,"error: tokenNetWorth logic error!");
         return userInfoMap[account].distribution.mul(tokenNetWorth-origin).mul(getPeriodWeight(periodID,userMaxPeriod))/1000/calDecimals;
     }
+    /**
+     * @dev Stake FPT-A coin and get distribution for mining.
+     * @param amount FPT-A amount that transfer into mine pool.
+     */
     function stakeFPTA(uint256 amount)public nonReentrant notHalted{
         amount = getPayableAmount(_FPTA,amount);
         require(amount > 0, 'stake amount is zero');
@@ -398,6 +488,11 @@ contract fixedMinePool is fixedMinePoolData {
         addDistribution(msg.sender);
         emit StakeFPTA(msg.sender,amount);
     }
+    /**
+     * @dev Air drop to user some FPT-B coin and lock one period and get distribution for mining.
+     * @param user air drop's recieptor.
+     * @param ftp_b_amount FPT-B amount that transfer into mine pool.
+     */
     function lockAirDrop(address user,uint256 ftp_b_amount) external onlyOperator(1){
         uint256 curPeriod = getPeriodIndex(currentTime());
         uint256 maxId = userInfoMap[user].maxPeriodID;
@@ -410,6 +505,11 @@ contract fixedMinePool is fixedMinePoolData {
         addDistribution(user);
         emit LockAirDrop(msg.sender,user,ftp_b_amount);
     }
+    /**
+     * @dev Stake FPT-B coin and lock locedPreiod and get distribution for mining.
+     * @param amount FPT-B amount that transfer into mine pool.
+     * @param locedPreiod locked preiod number.
+     */
     function stakeFPTB(uint256 amount,uint256 lockedPeriod)public validPeriod(lockedPeriod) nonReentrant notHalted{
         uint256 curPeriod = getPeriodIndex(currentTime());
         require(curPeriod+lockedPeriod-1>=userInfoMap[msg.sender].maxPeriodID, "lockedPeriod cannot be smaller than current locked period");
@@ -425,6 +525,10 @@ contract fixedMinePool is fixedMinePoolData {
         addDistribution(msg.sender);
         emit StakeFPTB(msg.sender,amount,lockedPeriod);
     }
+    /**
+     * @dev withdraw FPT-A coin.
+     * @param amount FPT-A amount that withdraw from mine pool.
+     */
     function unstakeFPTA(uint256 amount)public nonReentrant notHalted{
         require(amount > 0, 'unstake amount is zero');
         require(userInfoMap[msg.sender]._FPTABalance >= amount,
@@ -435,6 +539,10 @@ contract fixedMinePool is fixedMinePoolData {
         _redeem(msg.sender,_FPTA,amount);
         emit UnstakeFPTA(msg.sender,amount);
     }
+    /**
+     * @dev withdraw FPT-B coin.
+     * @param amount FPT-B amount that withdraw from mine pool.
+     */
     function unstakeFPTB(uint256 amount)public nonReentrant notHalted periodExpired(msg.sender){
         require(amount > 0, 'unstake amount is zero');
         require(userInfoMap[msg.sender]._FPTBBalance >= amount,
@@ -445,6 +553,10 @@ contract fixedMinePool is fixedMinePoolData {
         _redeem(msg.sender,_FPTB,amount);
         emit UnstakeFPTB(msg.sender,amount);
     }
+    /**
+     * @dev Add FPT-B locked period.
+     * @param lockedPeriod FPT-B locked preiod number.
+     */
     function changeFPTBLockedPeriod(uint256 lockedPeriod)public validPeriod(lockedPeriod) notHalted{
         require(userInfoMap[msg.sender]._FPTBBalance > 0, "stake FPTB balance is zero");
         uint256 curPeriod = getPeriodIndex(currentTime());
@@ -458,7 +570,11 @@ contract fixedMinePool is fixedMinePoolData {
         addDistribution(msg.sender);
         emit ChangeLockedPeriod(msg.sender,lockedPeriod);
     }
-
+    /**
+     * @dev Auxiliary function. getting user's payment
+     * @param settlement user's payment coin.
+     * @param settlementAmount user's payment amount.
+     */
     function getPayableAmount(address settlement,uint256 settlementAmount) internal returns (uint256) {
         if (settlement == address(0)){
             settlementAmount = msg.value;
@@ -471,6 +587,10 @@ contract fixedMinePool is fixedMinePoolData {
         }
         return settlementAmount;
     }
+    /**
+     * @dev Auxiliary function. Clear user's distribution amount.
+     * @param account user's account.
+     */
     function removeDistribution(address account) internal {
         uint256 addrLen = whiteList.length;
         for(uint256 i=0;i<addrLen;i++){
@@ -487,6 +607,10 @@ contract fixedMinePool is fixedMinePoolData {
         userInfoMap[account].distribution =  0;
         removePremiumDistribution(account);
     }
+    /**
+     * @dev Auxiliary function. Add user's distribution amount.
+     * @param account user's account.
+     */
     function addDistribution(address account) internal {
         uint256 distri = calculateDistribution(account);
         if (userInfoMap[account].maxPeriodID == 0){
@@ -504,6 +628,10 @@ contract fixedMinePool is fixedMinePoolData {
         totalDistribution = totalDistribution.add(distri);
         addPremiumDistribution(account);
     }
+    /**
+     * @dev Auxiliary function. calculate user's distribution.
+     * @param account user's account.
+     */
     function calculateDistribution(address account) internal view returns (uint256){
         uint256 fptAAmount = userInfoMap[account]._FPTABalance;
         uint256 fptBAmount = userInfoMap[account]._FPTBBalance;
@@ -511,9 +639,18 @@ contract fixedMinePool is fixedMinePoolData {
         return _FPTARatio.mul(fptAAmount).add(_FPTBRatio.mul(fptBAmount)).add(
             _RepeatRatio.mul(repeat));
     }
+    /**
+     * @dev Auxiliary function. get weight distribution in each period.
+     * @param periodID period ID.
+     */
     function getweightDistribution(uint256 periodID)internal view returns (uint256) {
         return weightDistributionMap[periodID].add(totalDistribution);
     }
+    /**
+     * @dev Auxiliary function. get mine weight ratio from current period to one's maximium period.
+     * @param currentID current period ID.
+     * @param maxPeriod user's maximium period ID.
+     */
     function getPeriodWeight(uint256 currentID,uint256 maxPeriod) public pure returns (uint256) {
         if (maxPeriod == 0 || currentID > maxPeriod){
             return 1000;
@@ -521,15 +658,15 @@ contract fixedMinePool is fixedMinePoolData {
         return maxPeriod.sub(currentID).mul(periodWeight) +baseWeight;
     }
 
-       /**
-     * @dev retrieve total distributed mine coins.
+    /**
+     * @dev retrieve total distributed options premium.
      */
     function getTotalPremium()public view returns(uint256){
         return totalDistributedPremium;
     }
 
     /**
-     * @dev user redeem mine rewards.
+     * @dev user redeem his options premium rewards.
      * @param amount redeem amount.
      */
     function redeemPremium(uint256 amount)public nonReentrant notHalted {
@@ -541,11 +678,15 @@ contract fixedMinePool is fixedMinePoolData {
 
 
     /**
-     * @dev the auxiliary function for _mineSettlementAll. Calculate latest time phase distributied mine amount.
+     * @dev get user's premium balance.
+     * @param account user's account
      */ 
     function getUserLatestPremium(address account)public view returns(uint256){
         return userPremiumBalance[account].add(_getUserPremium(account));
     }
+    /**
+     * @dev the auxiliary function for getUserLatestPremium. Calculate latest time phase premium.
+     */ 
     function _getUserPremium(address account)internal view returns(uint256){
         uint256 FPTBBalance = userInfoMap[account]._FPTBBalance;
         if (FPTBBalance > 0){
@@ -566,7 +707,11 @@ contract fixedMinePool is fixedMinePoolData {
         }
         return 0;
     }
-
+    /**
+     * @dev Distribute premium from foundation.
+     * @param periodID period ID
+     * @param amount premium amount.
+     */ 
     function distributePremium(uint256 periodID,uint256 amount)public onlyOperator(0) {
         amount = getPayableAmount(_premium,amount);
         require(amount > 0, 'Distribution amount is zero');
@@ -578,6 +723,10 @@ contract fixedMinePool is fixedMinePoolData {
         distributedPeriod.push(uint64(periodID));
         emit DistributePremium(msg.sender,periodID,amount);
     }
+    /**
+     * @dev Auxiliary function. Clear user's premium distribution amount.
+     * @param account user's account.
+     */ 
     function removePremiumDistribution(address account) internal {
         settlePremium(account);
         uint256 beginTime = currentTime(); 
@@ -594,10 +743,18 @@ contract fixedMinePool is fixedMinePoolData {
             }
         }
     }
+    /**
+     * @dev Auxiliary function. Calculate and record user's premium.
+     * @param account user's account.
+     */ 
     function settlePremium(address account)internal{
         userPremiumBalance[account] = userPremiumBalance[account].add(getUserLatestPremium(account));
         userLastPremiumIndex[msg.sender] = distributedPeriod.length;
     }
+    /**
+     * @dev Auxiliary function. Add user's premium distribution amount.
+     * @param account user's account.
+     */ 
     function addPremiumDistribution(address account) internal {
         uint256 beginTime = currentTime(); 
         uint256 nowId = getPeriodIndex(beginTime);
@@ -612,16 +769,24 @@ contract fixedMinePool is fixedMinePoolData {
         }
 
     }
-
+    /**
+     * @dev Throws if user's locked expired timestamp is less than now.
+     */
     modifier periodExpired(address account){
         require(userInfoMap[account].lockedExpired < currentTime(),'locked period is not expired');
 
         _;
     }
+    /**
+     * @dev Throws if input period number is greater than _maxPeriod.
+     */
     modifier validPeriod(uint256 period){
         require(period >= 0 && period <= _maxPeriod, 'locked period must be in valid range');
         _;
     }
+    /**
+     * @dev get now timestamp.
+     */
     function currentTime() internal view returns (uint256){
         return now;
     }
