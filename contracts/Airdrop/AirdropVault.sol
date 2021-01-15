@@ -165,8 +165,8 @@ contract AirDropVault is AirDropVaultData {
         uint256 i = 0;
         uint256 idx = (now - sushiMineStartTime)/sushimineInterval;
         for(;i<_accounts.length;i++) {
-            require((!sushiMineRecord[idx][msg.sender]),"user's mine have been set already");
-            sushiMineRecord[idx][msg.sender] = true;
+            require((!sushiMineRecord[idx][_accounts[i]]),"user's mine have been set already");
+            sushiMineRecord[idx][_accounts[i]] = true;
             
             suhiUserMineBalance[_accounts[i]] = suhiUserMineBalance[_accounts[i]].add(_fnxnumbers[i]);
             sushiTotalMine = sushiTotalMine.add(_fnxnumbers[i]);
