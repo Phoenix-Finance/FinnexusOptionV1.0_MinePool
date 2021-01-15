@@ -41,12 +41,9 @@ contract AirDropVault is AirDropVaultData {
         _;
     }    
 
-    function initialize() onlyOwner public {
-    }
+    function initialize() onlyOwner public {}
     
-    function update() onlyOwner public{
-        
-    }
+    function update() onlyOwner public{ }
     
     function initAirdrop( address _optionColPool,
                                 address _minePool,
@@ -106,7 +103,7 @@ contract AirDropVault is AirDropVaultData {
     }
     
     
-    function whitelistClaim() external airdropinited {
+    function whitelistClaim() public airdropinited {
         require(userWhiteList[msg.sender]>0,"user balance is not enough");
         require(now >= claimBeginTime,"claim not begin");
         require(now < claimEndTime,"claim finished");
@@ -129,7 +126,7 @@ contract AirDropVault is AirDropVaultData {
     }
     
 
-    function freeClaim(address _targetToken) external airdropinited {
+    function freeClaim(address _targetToken) public airdropinited {
         require(tokenWhiteList[_targetToken],"the target token is in token whitelist");
         require(now >= claimBeginTime,"claim not begin");
         require(now < claimEndTime,"claim finished");
@@ -171,7 +168,7 @@ contract AirDropVault is AirDropVaultData {
         }
     }
     
-    function sushiMineClaim() external suhsimineinited {
+    function sushiMineClaim() public suhsimineinited {
         require(suhiUserMineBalance[msg.sender]>0,"sushi mine balance is not enough");
         
         uint256 amount = suhiUserMineBalance[msg.sender];

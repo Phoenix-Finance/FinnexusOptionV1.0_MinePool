@@ -12,40 +12,53 @@ contract AirDropVaultProxy is AirDropVaultData,baseProxy {
     constructor (address implementation_) baseProxy(implementation_) public{
     }
     
-    function setOptionColPool(address /*_optionColPool*/) public  {
-        delegateAndReturn();
-    }
-    
-    function setMinePool( address /*_minePool*/) public  {
-       delegateAndReturn();
-    }
-    
-    function setFnxToken(address /*_fnxToken*/) public  {
-        delegateAndReturn();
-    }
-   
-    function setFptbToken(address /*_ftpbToken*/) public  {
-        delegateAndReturn();
-    }
-    
-
-    function getbackLeftFnx(address /*reciever*/)  public  {
-        delegateAndReturn();
-    }  
-
-
     function balanceOfAirdrop(address /*account*/) public view returns (uint256) {
         delegateToViewAndReturn();   
     }
+    
+    function initAirdrop( address /*_optionColPool*/,
+                          address /*_minePool*/,
+                          address /*_fnxToken*/,
+                          address /*_ftpbToken*/,
+                          uint256 /*_claimBeginTime*/,
+                          uint256 /*_claimEndTime*/,
+                          uint256 /*_fnxPerFreeClaimUser*/,
+                          uint256 /*_minBalForFreeClaim*/,
+                          uint256 /*_maxFreeFnxAirDrop*/,
+                          uint256 /*_maxWhiteListFnxAirDrop*/) public {
+        delegateAndReturn();
+    }
+    
+    function initSushiMine( address /*_cfnxToken*/,
+                            uint256 /*_sushiMineStartTime*/,
+                            uint256 /*_sushimineInterval*/) public  {
+       delegateAndReturn();
+    }
+    
+    function getbackLeftFnx(address /*_reciever*/)  public {
+        delegateAndReturn();
+     }
+     
 
-
-    function addWhiteList(address/*_account*/,uint256 /*_fnxnumber*/) public {
+    function addWhiteList(address[] memory /*_accounts*/,uint256[] memory /*_fnxnumbers*/) public {
         delegateAndReturn();
     }
     
     
-    function claim() external {
+    function whitelistClaim() public {
         delegateAndReturn();
     }
+    
+    function freeClaim(address /*_targetToken*/) public {
+         delegateAndReturn();
+    }
+    
+    function addSushiMineList(address[] memory /*_accounts*/,uint256[] memory /*_fnxnumbers*/) public {
+         delegateAndReturn();
+    }
+    
+     function sushiMineClaim() external {
+          delegateAndReturn();
+     }
     
 }
