@@ -107,7 +107,10 @@ contract AirDropVault is AirDropVaultData {
     
     
     function whitelistClaim() external airdropinited {
-        require(userWhiteList[msg.sender]==0,"user balance is not enough");
+        require(userWhiteList[msg.sender]>0,"user balance is not enough");
+        require(now >= claimBeginTime,"claim not begin");
+        require(now < claimEndTime,"claim finished");
+        
         uint256 amount = userWhiteList[msg.sender];
         userWhiteList[msg.sender] = 0;
         totalWhiteListClaimed = totalWhiteListClaimed.add(amount);
@@ -179,6 +182,7 @@ contract AirDropVault is AirDropVaultData {
         uint256 aftercfnc = IERC20(cfnxToken).balanceOf(address(this));
         uint256 cfncnum = precfnx.sub(aftercfnc);
         require(cfncnum==amount,"transfer balance is wrong");
+        emit SushiMineClaim(msg.sender,amount);
     }
       
 }

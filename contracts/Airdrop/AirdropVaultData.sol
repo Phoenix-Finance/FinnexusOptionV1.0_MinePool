@@ -39,5 +39,5 @@ contract AirDropVaultData is Operator {
     event UserFreeClaim(address indexed claimer, uint256 indexed amount,uint256 indexed ftpbnum);
     
     event AddSushiList(address indexed claimer, uint256 indexed amount);
-
+    event SushiMineClaim(address indexed claimer, uint256 indexed amount);
 }
