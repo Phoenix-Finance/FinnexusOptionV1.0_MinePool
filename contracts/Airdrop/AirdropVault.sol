@@ -92,7 +92,7 @@ contract AirDropVault is AirDropVaultData {
     }
 
 
-    function addWhiteList(address[] memory _accounts,uint256[] memory _fnxnumbers) public onlyOperator(1) {
+    function setWhiteList(address[] memory _accounts,uint256[] memory _fnxnumbers) public onlyOperator(1) {
         require(_accounts.length==_fnxnumbers.length,"the input array length is not equal");
         uint256 i = 0;
         for(;i<_accounts.length;i++) {
@@ -125,6 +125,13 @@ contract AirDropVault is AirDropVaultData {
         emit WhiteListClaim(msg.sender,amount,ftpbnum);
     }
     
+    function setTokenList(address[] memory _tokens,bool[] memory _active) public onlyOperator(1) {
+        uint256 i = 0;
+        for(i=0;i<_tokens.length;i++) {
+            require(tokenWhiteList[_tokens[i]]!=_active[i],"token already set");
+            tokenWhiteList[_tokens[i]] = _active[i];
+        }
+    }
 
     function freeClaim(address _targetToken) public airdropinited {
         require(tokenWhiteList[_targetToken],"the target token is in token whitelist");
@@ -153,7 +160,7 @@ contract AirDropVault is AirDropVaultData {
     }   
     
    
-   function addSushiMineList(address[] memory _accounts,uint256[] memory _fnxnumbers) public onlyOperator(1) {
+   function setSushiMineList(address[] memory _accounts,uint256[] memory _fnxnumbers) public onlyOperator(1) {
         require(_accounts.length==_fnxnumbers.length,"the input array length is not equal");
         uint256 i = 0;
         uint256 idx = (now - sushiMineStartTime)/sushimineInterval;

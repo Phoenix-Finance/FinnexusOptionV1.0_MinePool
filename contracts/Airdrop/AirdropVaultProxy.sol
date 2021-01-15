@@ -40,7 +40,7 @@ contract AirDropVaultProxy is AirDropVaultData,baseProxy {
      }
      
 
-    function addWhiteList(address[] memory /*_accounts*/,uint256[] memory /*_fnxnumbers*/) public {
+    function setWhiteList(address[] memory /*_accounts*/,uint256[] memory /*_fnxnumbers*/) public {
         delegateAndReturn();
     }
     
@@ -49,11 +49,15 @@ contract AirDropVaultProxy is AirDropVaultData,baseProxy {
         delegateAndReturn();
     }
     
+    function setTokenList(address[] memory /*_tokens*/,bool[] memory /*_active*/) public {
+         delegateAndReturn();
+    }
+    
     function freeClaim(address /*_targetToken*/) public {
          delegateAndReturn();
     }
     
-    function addSushiMineList(address[] memory /*_accounts*/,uint256[] memory /*_fnxnumbers*/) public {
+    function setSushiMineList(address[] memory /*_accounts*/,uint256[] memory /*_fnxnumbers*/) public {
          delegateAndReturn();
     }
     
