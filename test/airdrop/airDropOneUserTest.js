@@ -190,11 +190,11 @@ contract('TokenConverter', function (accounts) {
         assert.equal(diff,10);
     })
 
-    it('added sushi mine and user get sushi mine', async function () {
+    it('added sushi mine and user get sushi mine in one inteval', async function () {
         let lastedToBlkNum = await web3.eth.getBlockNumber();
         let lastblock = await  web3.eth.getBlock(lastedToBlkNum);
         //initSushiMine(address _cfnxToken,uint256 _sushiMineStartTime,uint256 _sushimineInterval)
-        let tx = await airdropproxyInst.initSushiMine(cfnxInst.address,lastblock.timestamp,lastblock.timestamp+timeSpan);
+        let tx = await airdropproxyInst.initSushiMine(cfnxInst.address,lastblock.timestamp,timeSpan);
         assert.equal(tx.receipt.status,true);
 
         tx = await cfnxInst.mint(airdropproxyInst.address,web3.utils.toWei(fnxAmount));
@@ -230,7 +230,51 @@ contract('TokenConverter', function (accounts) {
             console.log("diff mine user CFNX=" + diff);
             assert.equal(diff,fnxPerPerson.toNumber());
         }
+    });
 
+    it('added sushi mine and user get sushi mine after several interval', async function () {
+       await time.increase(timeSpan + 2);
+       let tx = await cfnxInst.mint(airdropproxyInst.address,web3.utils.toWei(fnxAmount.mul(new BN(3))));
+        assert.equal(tx.receipt.status,true);
+
+        let users = [];
+        let usersFnxNum = [];
+        let i = 0;
+        for(i=0;i<userCount;i++) {
+            users.push(accounts[i]);
+            usersFnxNum.push(web3.utils.toWei(fnxPerPerson));
+            //console.log(usersFnxNum[i])
+        }
+        tx = await airdropproxyInst.setSushiMineList(users,usersFnxNum);
+        assert.equal(tx.receipt.status,true);
+
+        await time.increase(timeSpan + 2);
+        tx = await  airdropproxyInst.setSushiMineList(users,usersFnxNum);
+        assert.equal(tx.receipt.status,true);
+
+        await time.increase(timeSpan + 2);
+        tx = await  airdropproxyInst.setSushiMineList(users,usersFnxNum);
+        assert.equal(tx.receipt.status,true);
+
+        i =0;
+        for(;i<userCount;i++) {
+            console.log("user"+i +" airdrop")
+            let beforeCFnxAirdropproxy = await cfnxInst.balanceOf(airdropproxyInst.address);
+            let beforeCfnxUser =  await cfnxInst.balanceOf(accounts[i]);
+
+            let tx = await airdropproxyInst.sushiMineClaim({from:accounts[i]});
+            assert.equal(tx.receipt.status,true);
+
+            let afterCFnxAirdropproxy = await cfnxInst.balanceOf(airdropproxyInst.address);
+            let afterCfnxUser =  await cfnxInst.balanceOf(accounts[i]);
+
+            let diff = web3.utils.fromWei(new BN(beforeCFnxAirdropproxy)) - web3.utils.fromWei(new BN(afterCFnxAirdropproxy));
+            console.log("diff proxy fnx=" + diff);
+
+            diff = web3.utils.fromWei(new BN(afterCfnxUser)) - web3.utils.fromWei(new BN(beforeCfnxUser));
+            console.log("diff mine user CFNX=" + diff);
+            assert.equal(diff,fnxPerPerson.toNumber()*3);
+        }
     });
 
 
