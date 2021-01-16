@@ -21,12 +21,13 @@ contract AirDropVaultData is Operator {
     uint256 public claimBeginTime;
     uint256 public claimEndTime;
     uint256 public fnxPerFreeClaimUser;
-    uint256 public minBalForFreeClaim;
-    
-    //the user's locked total balance
+
+    //users in white list airdrop
     mapping (address => uint256) public userWhiteList;
-    mapping (address => bool)    public tokenWhiteList;
-    mapping (address => bool)    public freeClaimedUserList;
+    //target airdrop token list address=>min balance require
+    mapping (address => uint256)  public tokenWhiteList;
+    //the user which is claimed already for different token
+    mapping (address=>mapping(address => bool)) public freeClaimedUserList;
     
     uint256 public sushiTotalMine;
     uint256 public sushiMineStartTime;

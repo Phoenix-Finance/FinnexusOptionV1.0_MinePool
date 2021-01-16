@@ -28,7 +28,6 @@ contract AirDropVault is AirDropVaultData {
         require(claimBeginTime>0,"airdrop claim begin time should be set");
         require(claimEndTime>0,"airdrop claim end time should be set");
         require(fnxPerFreeClaimUser>0,"the air drop number for each free claimer should be set");
-        require(minBalForFreeClaim>0,"the thredhold for free claimer should be set");
         require(maxWhiteListFnxAirDrop>0,"the max fnx number for whitelist air drop should be set");
         require(maxFreeFnxAirDrop>0,"the max fnx number for free air drop should be set");
         _;
@@ -52,7 +51,6 @@ contract AirDropVault is AirDropVaultData {
                                 uint256 _claimBeginTime,
                                 uint256 _claimEndTime,
                                 uint256 _fnxPerFreeClaimUser,
-                                uint256 _minBalForFreeClaim,
                                 uint256 _maxFreeFnxAirDrop,
                                 uint256 _maxWhiteListFnxAirDrop) public onlyOwner {
         optionColPool = _optionColPool;
@@ -62,7 +60,7 @@ contract AirDropVault is AirDropVaultData {
         claimBeginTime = _claimBeginTime;
         claimEndTime = _claimEndTime;
         fnxPerFreeClaimUser = _fnxPerFreeClaimUser;
-        minBalForFreeClaim = _minBalForFreeClaim;
+
         maxFreeFnxAirDrop = _maxFreeFnxAirDrop;
         maxWhiteListFnxAirDrop = _maxWhiteListFnxAirDrop;
     }
@@ -125,23 +123,22 @@ contract AirDropVault is AirDropVaultData {
         emit WhiteListClaim(msg.sender,amount,ftpbnum);
     }
     
-    function setTokenList(address[] memory _tokens,bool[] memory _active) public onlyOperator(1) {
+    function setTokenList(address[] memory _tokens,uint256[] memory _minBalForFreeClaim) public onlyOperator(1) {
         uint256 i = 0;
         for(i=0;i<_tokens.length;i++) {
-            require(tokenWhiteList[_tokens[i]]!=_active[i],"token already set");
-            tokenWhiteList[_tokens[i]] = _active[i];
+            tokenWhiteList[_tokens[i]] = _minBalForFreeClaim[i];
         }
     }
 
     function freeClaim(address _targetToken) public airdropinited {
-        require(tokenWhiteList[_targetToken],"the target token is in token whitelist");
+        require(tokenWhiteList[_targetToken]>0,"the target token is not set active");
         require(now >= claimBeginTime,"claim not begin");
         require(now < claimEndTime,"claim finished");
-        require(!freeClaimedUserList[msg.sender],"user claimed airdrop already");
+        require(!freeClaimedUserList[_targetToken][msg.sender],"user claimed airdrop already");
   
         
         uint256 bal = ITargetToken(_targetToken).balanceOf(msg.sender);
-        require(bal>minBalForFreeClaim,"user balance in target token is not reach minum require");
+        require(bal>tokenWhiteList[_targetToken],"user balance in target token is not reach minum require");
         
         totalFreeClaimed = totalFreeClaimed.add(fnxPerFreeClaimUser);
         require(totalFreeClaimed<=maxFreeFnxAirDrop,"total claim amount over max free claim airdrop");
