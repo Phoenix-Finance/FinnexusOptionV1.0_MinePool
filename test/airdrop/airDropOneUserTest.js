@@ -68,8 +68,9 @@ contract('TokenConverter', function (accounts) {
         tx = await airdropproxyInst.setOperator(1,accounts[0]);
         assert.equal(tx.receipt.status,true);
 
-        tx = await airdropproxyInst.setTokenList([curvInst.address],[true]);
+        tx = await airdropproxyInst.setTokenList([curvInst.address],[web3.utils.toWei(minThredhold)]);
         assert.equal(tx.receipt.status,true);
+
         let i = 0;
         for(i=0;i<userCount;i++) {
             tx = await curvInst.mint(accounts[i],web3.utils.toWei(fnxPerPerson));
@@ -96,7 +97,6 @@ contract('TokenConverter', function (accounts) {
                     lastblock.timestamp,
                     lastblock.timestamp + timeSpan,
                     web3.utils.toWei(fnxPerPerson),
-                    web3.utils.toWei(minThredhold),
                     web3.utils.toWei(maxFreeClaim),
                     web3.utils.toWei(maxWhiteListClaim));
 
