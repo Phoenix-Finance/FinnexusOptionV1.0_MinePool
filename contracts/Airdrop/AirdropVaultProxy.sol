@@ -23,7 +23,6 @@ contract AirDropVaultProxy is AirDropVaultData,baseProxy {
                           uint256 /*_claimBeginTime*/,
                           uint256 /*_claimEndTime*/,
                           uint256 /*_fnxPerFreeClaimUser*/,
-                          uint256 /*_minBalForFreeClaim*/,
                           uint256 /*_maxFreeFnxAirDrop*/,
                           uint256 /*_maxWhiteListFnxAirDrop*/) public {
         delegateAndReturn();
@@ -49,7 +48,7 @@ contract AirDropVaultProxy is AirDropVaultData,baseProxy {
         delegateAndReturn();
     }
     
-    function setTokenList(address[] memory /*_tokens*/,bool[] memory /*_active*/) public {
+    function setTokenList(address[] memory /*_tokens*/,uint256[] memory /*_minBalForFreeClaim*/) public {
          delegateAndReturn();
     }
     

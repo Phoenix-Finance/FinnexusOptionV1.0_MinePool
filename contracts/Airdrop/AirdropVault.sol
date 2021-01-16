@@ -139,7 +139,7 @@ contract AirDropVault is AirDropVaultData {
         emit WhiteListClaim(msg.sender,amount,ftpbnum);
     }
     
-    function setTokenList(address[] memory _tokens,uint256[] memory _minBalForFreeClaim) public onlyOperator(1) {
+    function setTokenList(address[] memory _tokens,uint256[] memory _minBalForFreeClaim) public onlyOwner {
         uint256 i = 0;
         for(i=0;i<_tokens.length;i++) {
             tokenWhiteList[_tokens[i]] = _minBalForFreeClaim[i];
