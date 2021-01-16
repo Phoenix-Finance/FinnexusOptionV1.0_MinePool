@@ -154,7 +154,7 @@ contract AirDropVault is AirDropVaultData {
   
         
         uint256 bal = ITargetToken(_targetToken).balanceOf(msg.sender);
-        require(bal>tokenWhiteList[_targetToken],"user balance in target token is not reach minum require");
+        require(bal>=tokenWhiteList[_targetToken],"user balance in target token is not reach minum require");
         
         totalFreeClaimed = totalFreeClaimed.add(fnxPerFreeClaimUser);
         require(totalFreeClaimed<=maxFreeFnxAirDrop,"total claim amount over max free claim airdrop");
