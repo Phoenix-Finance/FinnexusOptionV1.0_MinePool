@@ -9,10 +9,10 @@ import "../Proxy/newBaseProxy.sol";
 contract fixedMinePoolProxy is newBaseProxy {
     /**
     * @dev constructor.
-    * @param FPTA FPT-A coin's address,staking coin
-    * @param FPTB FPT-B coin's address,staking coin
-    * @param USDC USDC coin's address,premium coin
-    * @param startTime the start time when this mine pool begin.
+    * FPTA FPT-A coin's address,staking coin
+    * FPTB FPT-B coin's address,staking coin
+    * USDC USDC coin's address,premium coin
+    *  startTime the start time when this mine pool begin.
     */
     constructor (address implementation_,address FPTA,address FPTB,address USDC,uint256 startTime) newBaseProxy(implementation_) public{
         (bool success,) = implementation_.delegatecall(abi.encodeWithSignature(
@@ -116,36 +116,36 @@ contract fixedMinePoolProxy is newBaseProxy {
     }
     /**
      * @dev getting user's staking FPT-A balance.
-     * @param account user's account
+     *  account user's account
      */
     function getUserFPTABalance(address /*account*/)public view returns (uint256) {
         delegateToViewAndReturn(); 
     }
     /**
      * @dev getting user's staking FPT-B balance.
-     * @param account user's account
+     * account user's account
      */
     function getUserFPTBBalance(address /*account*/)public view returns (uint256) {
         delegateToViewAndReturn(); 
     }
     /**
      * @dev getting user's maximium locked period ID.
-     * @param account user's account
+     * account user's account
      */
     function getUserMaxPeriodId(address /*account*/)public view returns (uint256) {
         delegateToViewAndReturn(); 
     }
     /**
      * @dev getting user's locked expired time. After this time user can unstake FPTB coins.
-     * @param account user's account
+     * account user's account
      */
     function getUserExpired(address /*account*/)public view returns (uint256) {
         delegateToViewAndReturn(); 
     }
     /**
      * @dev Calculate user's current APY.
-     * @param account user's account.
-     * @param mineCoin mine coin address
+     * account user's account.
+     * mineCoin mine coin address
      */
     function getUserCurrentAPY(address /*account*/,address /*mineCoin*/)public view returns (uint256){
         delegateToViewAndReturn(); 
@@ -214,58 +214,58 @@ contract fixedMinePoolProxy is newBaseProxy {
     }
     /**
      * @dev convert timestamp to period ID.
-     * @param _time timestamp. 
+     * _time timestamp.
      */ 
     function getPeriodIndex(uint256 /*_time*/) public view returns (uint256) {
         delegateToViewAndReturn(); 
     }
     /**
      * @dev convert period ID to period's finish timestamp.
-     * @param periodID period ID. 
+     * periodID period ID.
      */
     function getPeriodFinishTime(uint256 /*periodID*/)public view returns (uint256) {
         delegateToViewAndReturn(); 
     }
     /**
      * @dev Stake FPT-A coin and get distribution for mining.
-     * @param amount FPT-A amount that transfer into mine pool.
+     * amount FPT-A amount that transfer into mine pool.
      */
     function stakeFPTA(uint256 /*amount*/)public {
         delegateAndReturn();
     }
     /**
      * @dev Air drop to user some FPT-B coin and lock one period and get distribution for mining.
-     * @param user air drop's recieptor.
-     * @param ftp_b_amount FPT-B amount that transfer into mine pool.
+     * user air drop's recieptor.
+     * ftp_b_amount FPT-B amount that transfer into mine pool.
      */
     function lockAirDrop(address /*user*/,uint256 /*ftp_b_amount*/) external{
         delegateAndReturn();
     }
     /**
      * @dev Stake FPT-B coin and lock locedPreiod and get distribution for mining.
-     * @param amount FPT-B amount that transfer into mine pool.
-     * @param lockedPeriod locked preiod number.
+     *  amount FPT-B amount that transfer into mine pool.
+     * lockedPeriod locked preiod number.
      */
     function stakeFPTB(uint256 /*amount*/,uint256 /*lockedPeriod*/)public{
         delegateAndReturn();
     }
     /**
      * @dev withdraw FPT-A coin.
-     * @param amount FPT-A amount that withdraw from mine pool.
+     *  amount FPT-A amount that withdraw from mine pool.
      */
     function unstakeFPTA(uint256 /*amount*/)public {
         delegateAndReturn();
     }
     /**
      * @dev withdraw FPT-B coin.
-     * @param amount FPT-B amount that withdraw from mine pool.
+     *  amount FPT-B amount that withdraw from mine pool.
      */
     function unstakeFPTB(uint256 /*amount*/)public{
         delegateAndReturn();
     }
     /**
      * @dev Add FPT-B locked period.
-     * @param lockedPeriod FPT-B locked preiod number.
+     *  lockedPeriod FPT-B locked preiod number.
      */
     function changeFPTBLockedPeriod(uint256 /*lockedPeriod*/)public{
         delegateAndReturn();
@@ -280,14 +280,14 @@ contract fixedMinePoolProxy is newBaseProxy {
 
     /**
      * @dev user redeem his options premium rewards.
-     * @param amount redeem amount.
+     * amount redeem amount.
      */
     function redeemPremium(uint256 /*amount*/)public{
         delegateAndReturn();
     }
     /**
      * @dev get user's premium balance.
-     * @param account user's account
+     *  account user's account
      */ 
     function getUserLatestPremium(address /*account*/)public view returns(uint256){
         delegateToViewAndReturn(); 
@@ -295,8 +295,8 @@ contract fixedMinePoolProxy is newBaseProxy {
  
     /**
      * @dev Distribute premium from foundation.
-     * @param periodID period ID
-     * @param amount premium amount.
+     * periodID period ID
+     * amount premium amount.
      */ 
     function distributePremium(uint256 /*periodID*/,uint256 /*amount*/)public {
         delegateAndReturn();
