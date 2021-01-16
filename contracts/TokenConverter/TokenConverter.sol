@@ -122,7 +122,7 @@ contract TokenConverter is TokenConverterData {
                             lockedAllRewards[msg.sender][i].alloc[j] = 0;
                         }
                         
-                        //updated left locked balance
+                        //updated left locked balance,possible?
                         if(subtotal<=lockedAllRewards[msg.sender][i].alloc[0]){
                             lockedAllRewards[msg.sender][i].alloc[0] = lockedAllRewards[msg.sender][i].alloc[0].sub(subtotal);
                         } else {
