@@ -53,22 +53,38 @@ contract AirDropVault is AirDropVaultData {
                                 uint256 _fnxPerFreeClaimUser,
                                 uint256 _maxFreeFnxAirDrop,
                                 uint256 _maxWhiteListFnxAirDrop) public onlyOwner {
-        optionColPool = _optionColPool;
-        minePool = _minePool;
-        fnxToken = _fnxToken;  
-        ftpbToken = _ftpbToken;
-        claimBeginTime = _claimBeginTime;
-        claimEndTime = _claimEndTime;
-        fnxPerFreeClaimUser = _fnxPerFreeClaimUser;
+        if(_optionColPool!=address(0))                            
+            optionColPool = _optionColPool;
+        if(_minePool!=address(0))    
+            minePool = _minePool;
+        if(_fnxToken!=address(0))    
+            fnxToken = _fnxToken;  
+        if(_ftpbToken!=address(0))    
+            ftpbToken = _ftpbToken;
+        
+        if(_claimBeginTime>0)    
+            claimBeginTime = _claimBeginTime;
+         
+        if(_claimEndTime>0)    
+            claimEndTime = _claimEndTime;
+            
+        if(_fnxPerFreeClaimUser>0)    
+            fnxPerFreeClaimUser = _fnxPerFreeClaimUser;
 
-        maxFreeFnxAirDrop = _maxFreeFnxAirDrop;
-        maxWhiteListFnxAirDrop = _maxWhiteListFnxAirDrop;
+        if(_maxFreeFnxAirDrop>0)
+            maxFreeFnxAirDrop = _maxFreeFnxAirDrop;
+            
+        if(_maxWhiteListFnxAirDrop>0)    
+            maxWhiteListFnxAirDrop = _maxWhiteListFnxAirDrop;
     }
     
     function initSushiMine(address _cfnxToken,uint256 _sushiMineStartTime,uint256 _sushimineInterval) public onlyOwner{
-        cfnxToken = _cfnxToken;
-        sushiMineStartTime = _sushiMineStartTime;
-        sushimineInterval = _sushimineInterval;
+        if(_cfnxToken!=address(0))
+            cfnxToken = _cfnxToken;
+        if(_sushiMineStartTime>0)    
+            sushiMineStartTime = _sushiMineStartTime;
+        if(_sushimineInterval>0)    
+            sushimineInterval = _sushimineInterval;
     }
     
 
