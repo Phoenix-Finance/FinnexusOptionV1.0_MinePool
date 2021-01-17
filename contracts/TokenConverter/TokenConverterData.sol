@@ -20,7 +20,7 @@ contract TokenConverterData is Managerable {
     uint256 public timeSpan = 30*24*3600;//one month
     uint256 public dispatchTimes = 6;    //6 times
     uint256 public txNum = 100; //100 times transfer tx 
-    uint256 public lockPeriod = 6*timeSpan;
+    uint256 public lockPeriod = dispatchTimes*timeSpan;
     
     //the user's locked total balance
     mapping (address => uint256) public lockedBalances;
