@@ -2,8 +2,9 @@ pragma solidity =0.5.16;
 
 import "../modules/Managerable.sol";
 import "../modules/Operator.sol";
+import "../modules/Halt.sol";
 
-contract AirDropVaultData is Operator {
+contract AirDropVaultData is Operator,Halt {
 
     
     address public optionColPool;

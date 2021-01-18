@@ -1,8 +1,9 @@
 pragma solidity =0.5.16;
 
 import "../modules/Managerable.sol";
+import "../modules/Halt.sol";
 
-contract TokenConverterData is Managerable {
+contract TokenConverterData is Managerable,Halt {
 
     struct lockedReward {
         uint256 startTime;
