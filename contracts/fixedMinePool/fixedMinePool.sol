@@ -240,6 +240,13 @@ contract fixedMinePool is fixedMinePoolData {
     function getPeriodFinishTime(uint256 periodID)public view returns (uint256) {
         return periodID.mul(_period).add(_startTime);
     }
+    function getCurrentTotalAPY(address mineCoin)public view returns (uint256) {
+        if (totalDistribution == 0 || mineInfoMap[mineCoin].mineInterval == 0){
+            return 0;
+        }
+        uint256 baseMine = mineInfoMap[mineCoin].mineAmount.mul(365 days)/mineInfoMap[mineCoin].mineInterval;
+        return baseMine.mul(getweightDistribution(getPeriodIndex(currentTime())))/totalDistribution;
+    }
     /**
      * @dev Calculate user's current APY.
      * @param account user's account.
@@ -253,6 +260,36 @@ contract fixedMinePool is fixedMinePoolData {
                 userInfoMap[account].distribution)/totalDistribution/mineInfoMap[mineCoin].mineInterval;
         return baseMine.mul(getPeriodWeight(getPeriodIndex(currentTime()),userInfoMap[account].maxPeriodID))/1000;
     }
+    /**
+     * @dev Calculate average locked time.
+     */
+    function getAverageLockedTime()public view returns (uint256) {
+        if (totalDistribution == 0){
+            return 0;
+        }
+        uint256 i = _maxPeriod-1;
+        uint256 nowIndex = getPeriodIndex(currentTime());
+        uint256 allLockedPeriod;
+        uint256 periodDistri = weightDistributionMap[nowIndex+i]/4;
+        allLockedPeriod = periodDistri.mul(getPeriodFinishTime(nowIndex+i).sub(currentTime()));
+        i--;
+        for (;;i--){
+            //p[i] = (p[i+1]*3+w[i]+w[i+2]-w[i+1]*2)4
+            periodDistri = periodDistri.mul(3).add(weightDistributionMap[nowIndex+i]).add(weightDistributionMap[nowIndex+i+2]);
+            uint256 subWeight = weightDistributionMap[nowIndex+i+1].mul(2);
+            if (periodDistri>subWeight){
+                periodDistri = (periodDistri-subWeight)/4;
+            }else{
+                periodDistri = 0;
+            }
+            allLockedPeriod = allLockedPeriod.add(periodDistri.mul(getPeriodFinishTime(nowIndex+i).sub(currentTime())));
+            if (i == 0){
+                break;
+            }
+        }
+        return allLockedPeriod.div(totalDistribution);
+    }
+
     /**
      * @dev the auxiliary function for _mineSettlementAll.
      * @param mineCoin mine coin address
@@ -460,7 +497,7 @@ contract fixedMinePool is fixedMinePoolData {
      */ 
     function _getPeriodWeightMined(address mineCoin,uint256 periodID,uint256 mintTime)internal view returns(uint256){
         if (totalDistribution > 0){
-            return _getPeriodMined(mineCoin,mintTime).mul(getweightDistribution(periodID)).div(totalDistribution);
+            return _getPeriodMined(mineCoin,mintTime).mul(getweightDistribution(periodID))/totalDistribution;
         }
         return 0;
     }
@@ -782,6 +819,9 @@ contract fixedMinePool is fixedMinePoolData {
      */
     modifier validPeriod(uint256 period){
         require(period >= 0 && period <= _maxPeriod, 'locked period must be in valid range');
+        if(period == 1){
+            require(getPeriodFinishTime(getCurrentPeriodID()+period)>currentTime() + 15 days, 'locked time must geater than 15 days');
+        }
         _;
     }
     /**
