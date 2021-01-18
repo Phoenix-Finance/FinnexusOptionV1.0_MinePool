@@ -1,8 +1,9 @@
 pragma solidity =0.5.16;
 
 import "../modules/Managerable.sol";
+import "../modules/Halt.sol";
 
-contract TokenConverterData is Managerable {
+contract TokenConverterData is Managerable,Halt {
 
     struct lockedReward {
         uint256 startTime;
@@ -20,7 +21,7 @@ contract TokenConverterData is Managerable {
     uint256 public timeSpan = 30*24*3600;//one month
     uint256 public dispatchTimes = 6;    //6 times
     uint256 public txNum = 100; //100 times transfer tx 
-    uint256 public lockPeriod = 6*timeSpan;
+    uint256 public lockPeriod = dispatchTimes*timeSpan;
     
     //the user's locked total balance
     mapping (address => uint256) public lockedBalances;

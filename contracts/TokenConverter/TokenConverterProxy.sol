@@ -2,11 +2,6 @@ pragma solidity =0.5.16;
 import "./TokenConverterData.sol";
 import "../Proxy/baseProxy.sol";
 
-/**
- * @title FPTCoin is finnexus collateral Pool token, implement ERC20 interface.
- * @dev ERC20 token. Its inside value is collatral pool net worth.
- *
- */
 contract TokenConverterProxy is TokenConverterData,baseProxy {
     
     constructor (address implementation_) baseProxy(implementation_) public{
