@@ -187,6 +187,10 @@ contract TokenConverter is TokenConverterData {
                break;
            }
         }
-    }    
+        
+        return totalRet;
+    }
+    
+  
     
 }
