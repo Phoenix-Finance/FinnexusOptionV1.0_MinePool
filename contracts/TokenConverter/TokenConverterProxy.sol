@@ -28,7 +28,7 @@ contract TokenConverterProxy is TokenConverterData,baseProxy {
         delegateAndReturn(); 
    }
    
-   function getClaimAbleBalance() public view returns (uint256) {
+   function getClaimAbleBalance(address ) public view returns (uint256) {
         delegateToViewAndReturn();     
    }
     

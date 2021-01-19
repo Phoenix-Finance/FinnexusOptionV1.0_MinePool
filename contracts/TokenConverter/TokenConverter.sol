@@ -148,32 +148,32 @@ contract TokenConverter is TokenConverterData {
         emit ClaimFnx(msg.sender,totalRet,txcnt);
     }
     
-    function getClaimAbleBalance() public view returns (uint256) {
+    function getClaimAbleBalance(address _user) public view returns (uint256) {
         require(fnxAddress!=address(0),"fnx token should be set");
         
         uint256 txcnt = 0;
-        uint256 i = lockedIndexs[msg.sender].beginIdx;
-        uint256 endIdx = lockedIndexs[msg.sender].totalIdx;
+        uint256 i = lockedIndexs[_user].beginIdx;
+        uint256 endIdx = lockedIndexs[_user].totalIdx;
         uint256 totalRet = 0;
         
         for(;i<endIdx && txcnt<txNum;i++) {
            //only count the rewards over at least one timeSpan
-           if (now >= lockedAllRewards[msg.sender][i].startTime + timeSpan) {
+           if (now >= lockedAllRewards[_user][i].startTime + timeSpan) {
                
-               if (lockedAllRewards[msg.sender][i].alloc[0] > 0) {
-                    if (now >= lockedAllRewards[msg.sender][i].startTime + lockPeriod) {
-                        totalRet = totalRet.add(lockedAllRewards[msg.sender][i].alloc[0]);
+               if (lockedAllRewards[_user][i].alloc[0] > 0) {
+                    if (now >= lockedAllRewards[_user][i].startTime + lockPeriod) {
+                        totalRet = totalRet.add(lockedAllRewards[_user][i].alloc[0]);
                     } else {
-                        uint256 timeIdx = (now - lockedAllRewards[msg.sender][i].startTime).div(timeSpan) + 1;
+                        uint256 timeIdx = (now - lockedAllRewards[_user][i].startTime).div(timeSpan) + 1;
                         uint256 j = 2;
                         uint256 subtotal = 0;
                         for(;j<timeIdx+1;j++) {
-                            subtotal = subtotal.add(lockedAllRewards[msg.sender][i].alloc[j]);
+                            subtotal = subtotal.add(lockedAllRewards[_user][i].alloc[j]);
                         }
                         
                         //updated left locked balance,possible?
-                        if(subtotal>lockedAllRewards[msg.sender][i].alloc[0]){
-                            subtotal = lockedAllRewards[msg.sender][i].alloc[0];
+                        if(subtotal>lockedAllRewards[_user][i].alloc[0]){
+                            subtotal = lockedAllRewards[_user][i].alloc[0];
                         }
                         
                         totalRet = totalRet.add(subtotal);
