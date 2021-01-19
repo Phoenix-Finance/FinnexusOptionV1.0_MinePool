@@ -142,7 +142,7 @@ contract fixedMinePoolProxy is newBaseProxy {
     function getUserExpired(address /*account*/)public view returns (uint256) {
         delegateToViewAndReturn(); 
     }
-    function getCurrentTotalAPY(address mineCoin)public view returns (uint256){
+    function getCurrentTotalAPY(address /*mineCoin*/)public view returns (uint256){
         delegateToViewAndReturn(); 
     }
     /**
@@ -200,9 +200,8 @@ contract fixedMinePoolProxy is newBaseProxy {
     /**
      * @dev user redeem mine rewards.
      *  mineCoin mine coin address
-     *  amount redeem amount.
      */
-    function redeemMinerCoin(address /*mineCoin*/,uint256 /*amount*/)public{
+    function redeemMinerCoin(address /*mineCoin*/)public{
         delegateAndReturn();
     }
     /**
@@ -288,7 +287,7 @@ contract fixedMinePoolProxy is newBaseProxy {
      * @dev user redeem his options premium rewards.
      * amount redeem amount.
      */
-    function redeemPremium(uint256 /*amount*/)public{
+    function redeemPremium()public{
         delegateAndReturn();
     }
     /**
