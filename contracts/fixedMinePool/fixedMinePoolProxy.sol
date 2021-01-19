@@ -200,8 +200,9 @@ contract fixedMinePoolProxy is newBaseProxy {
     /**
      * @dev user redeem mine rewards.
      *  mineCoin mine coin address
+     *  amount redeem amount.
      */
-    function redeemMinerCoin(address /*mineCoin*/)public{
+    function redeemMinerCoin(address /*mineCoin*/,uint256 /*amount*/)public{
         delegateAndReturn();
     }
     /**
@@ -287,7 +288,7 @@ contract fixedMinePoolProxy is newBaseProxy {
      * @dev user redeem his options premium rewards.
      * amount redeem amount.
      */
-    function redeemPremium()public{
+    function redeemPremium(uint256 /*amount*/)public{
         delegateAndReturn();
     }
     /**

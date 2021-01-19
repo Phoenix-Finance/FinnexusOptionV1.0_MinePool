@@ -193,21 +193,23 @@ contract fixedMinePool is fixedMinePoolData {
     /**
      * @dev user redeem mine rewards.
      * @param mineCoin mine coin address
+     * @param amount redeem amount.
      */
-    function redeemMinerCoin(address mineCoin)public nonReentrant notHalted {
+    function redeemMinerCoin(address mineCoin,uint256 amount)public nonReentrant notHalted {
         _mineSettlement(mineCoin);
         _settleUserMine(mineCoin,msg.sender);
-        _redeemMineCoin(mineCoin,msg.sender);
+        _redeemMineCoin(mineCoin,msg.sender,amount);
     }
     /**
      * @dev subfunction for user redeem mine rewards.
      * @param mineCoin mine coin address
      * @param recieptor recieptor's account
+     * @param amount redeem amount.
      */
-    function _redeemMineCoin(address mineCoin,address payable recieptor) internal {
-        uint256 amount = userInfoMap[recieptor].minerBalances[mineCoin];
-        require (amount > 0,"redeem amount must more than zero!");
-        userInfoMap[recieptor].minerBalances[mineCoin] = 0;
+    function _redeemMineCoin(address mineCoin,address payable recieptor,uint256 amount) internal {
+        require (amount > 0,"input amount must more than zero!");
+        userInfoMap[recieptor].minerBalances[mineCoin] = 
+            userInfoMap[recieptor].minerBalances[mineCoin].sub(amount);
         _redeem(recieptor,mineCoin,amount);
         emit RedeemMineCoin(recieptor,mineCoin,amount);
     }
@@ -703,12 +705,12 @@ contract fixedMinePool is fixedMinePoolData {
 
     /**
      * @dev user redeem his options premium rewards.
+     * @param amount redeem amount.
      */
-    function redeemPremium()public nonReentrant notHalted {
-        settlePremium(msg.sender);
-        uint256 amount = userPremiumBalance[msg.sender];
+    function redeemPremium(uint256 amount)public nonReentrant notHalted {
         require(amount > 0,"redeem amount must be greater than zero");
-        userPremiumBalance[msg.sender] = 0;
+        settlePremium(msg.sender);
+        userPremiumBalance[msg.sender] = userPremiumBalance[msg.sender].sub(amount);
         _redeem(msg.sender,_premium,amount);
         emit RedeemPremium(msg.sender,amount);
     }
