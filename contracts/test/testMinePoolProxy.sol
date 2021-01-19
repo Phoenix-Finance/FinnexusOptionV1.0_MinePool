@@ -11,8 +11,8 @@ import "../fixedMinePool/fixedMinePoolProxy.sol";
  *
  */
 contract testMinePoolProxy is fixedMinePoolProxy {
-    constructor (address implementation_,address FPTA,address FPTB,address USDC,uint256 startTime)public
-         fixedMinePoolProxy(implementation_,FPTA,FPTB,USDC,startTime){
+    constructor (address implementation_,address FPTA,address FPTB,uint256 startTime)public
+         fixedMinePoolProxy(implementation_,FPTA,FPTB,startTime){
     }
     function setTime(uint256 /*_time*/) public{
         delegateAndReturn();

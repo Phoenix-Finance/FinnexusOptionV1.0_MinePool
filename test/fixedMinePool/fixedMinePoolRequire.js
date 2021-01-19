@@ -42,7 +42,7 @@ contract('fixedMinePool', function (accounts){
         assert.equal(fptB.toNumber(),0,"getUserFPTBBalance Error");
         let expired = await contracts.minePool.getUserExpired(accounts[0]);
         let curtime = Date.now()/1000+86400*15;
-        assert(Math.abs(expired.toNumber()-curtime)<10,"getTotalMined error");
+        assert.equal(expired.toNumber(),0,"stakeFPTA locked expiration error");
         contractBalance = await contracts.CFNXA.balanceOf(contracts.minePool.address);
         assert.equal(contractBalance.toNumber(),200000,"getUserFPTABalance Error");
         await checkUserDistribution(contracts,accounts[0]);

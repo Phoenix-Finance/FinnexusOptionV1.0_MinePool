@@ -11,15 +11,13 @@ contract fixedMinePoolProxy is newBaseProxy {
     * @dev constructor.
     * FPTA FPT-A coin's address,staking coin
     * FPTB FPT-B coin's address,staking coin
-    * USDC USDC coin's address,premium coin
     * startTime the start time when this mine pool begin.
     */
-    constructor (address implementation_,address FPTA,address FPTB,address USDC,uint256 startTime) newBaseProxy(implementation_) public{
+    constructor (address implementation_,address FPTA,address FPTB,uint256 startTime) newBaseProxy(implementation_) public{
         (bool success,) = implementation_.delegatecall(abi.encodeWithSignature(
-                "setAddresses(address,address,address,uint256)",
+                "setAddresses(address,address,uint256)",
                 FPTA,
                 FPTB,
-                USDC,
                 startTime));
         require(success);
     }
@@ -283,19 +281,24 @@ contract fixedMinePoolProxy is newBaseProxy {
     function getTotalPremium()public view returns(uint256){
         delegateToViewAndReturn(); 
     }
-
+    /**
+     * @dev user redeem his options premium rewards.
+     */
+    function redeemPremium()public{
+        delegateAndReturn();
+    }
     /**
      * @dev user redeem his options premium rewards.
      * amount redeem amount.
      */
-    function redeemPremium(uint256 /*amount*/)public{
+    function redeemPremiumCoin(address /*premiumCoin*/,uint256 /*amount*/)public{
         delegateAndReturn();
     }
     /**
      * @dev get user's premium balance.
      * account user's account
      */ 
-    function getUserLatestPremium(address /*account*/)public view returns(uint256){
+    function getUserLatestPremium(address /*account*/,address /*premiumCoin*/)public view returns(uint256){
         delegateToViewAndReturn(); 
     }
  
@@ -304,7 +307,7 @@ contract fixedMinePoolProxy is newBaseProxy {
      * periodID period ID
      * amount premium amount.
      */ 
-    function distributePremium(uint256 /*periodID*/,uint256 /*amount*/)public {
+    function distributePremium(address /*premiumCoin*/,uint256 /*periodID*/,uint256 /*amount*/)public {
         delegateAndReturn();
     }
         /**
@@ -334,11 +337,11 @@ contract fixedMinePoolProxy is newBaseProxy {
     /**
      * @dev Emitted when owner `account` distribute `amount` premium in `periodID` period.
      */
-    event DistributePremium(address indexed account,uint256 indexed periodID,uint256 amount);
+    event DistributePremium(address indexed account,address indexed premiumCoin,uint256 indexed periodID,uint256 amount);
     /**
      * @dev Emitted when `account` redeem `amount` premium.
      */
-    event RedeemPremium(address indexed account,uint256 amount);
+    event RedeemPremium(address indexed account,address indexed premiumCoin,uint256 amount);
 
     /**
      * @dev Emitted when `account` redeem `value` mineCoins.

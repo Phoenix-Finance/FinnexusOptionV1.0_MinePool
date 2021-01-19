@@ -46,37 +46,38 @@ contract('fixedMinePool_Timed', function (accounts){
         await contracts.minePool.stakeFPTB(100000,2);
         await contracts.minePool.setMineCoinInfo(contracts.MINE.address,2000000,1);
         await contracts.minePool.setTime(1500);
+        await contracts.minePool.setOperator(0,accounts[0]);
         for (var i=1;i<150;i++){
-            await contracts.minePool.distributePremium(i,10000);
+            await contracts.minePool.distributePremium(contracts.USDC.address,i,10000);
         }
         realMine = 10000;
-        let mineBalance = await contracts.minePool.getUserLatestPremium(accounts[0]);
+        let mineBalance = await contracts.minePool.getUserLatestPremium(accounts[0],contracts.USDC.address);
         assert.equal(mineBalance.toNumber(),realMine,"getMinerBalance error");
         let Balance0 = await contracts.USDC.balanceOf(contracts.minePool.address); 
-        await contracts.minePool.redeemPremium(mineBalance);
+        await contracts.minePool.redeemPremium();
         let Balance1 = await contracts.USDC.balanceOf(contracts.minePool.address); 
         assert.equal(mineBalance.toNumber(),Balance0.toNumber()-Balance1.toNumber(),"redeemPremium error");
 
-        mineBalance = await contracts.minePool.getUserLatestPremium(accounts[0]);
+        mineBalance = await contracts.minePool.getUserLatestPremium(accounts[0],contracts.USDC.address);
         assert.equal(mineBalance.toNumber(),0,"getMinerBalance error");
         await contracts.minePool.stakeFPTA(100000,{from:accounts[1]});
         await contracts.minePool.stakeFPTB(100000,12,{from:accounts[1]});
         await contracts.minePool.setTime(3000);
         for (var i=150;i<300;i++){
-            await contracts.minePool.distributePremium(i,10000);
+            await contracts.minePool.distributePremium(contracts.USDC.address,i,10000);
         }
-        mineBalance = await contracts.minePool.getUserLatestPremium(accounts[0]);
+        mineBalance = await contracts.minePool.getUserLatestPremium(accounts[0],contracts.USDC.address);
         assert.equal(mineBalance.toNumber(),0,"getMinerBalance error");
-        mineBalance = await contracts.minePool.getUserLatestPremium(accounts[1]);
+        mineBalance = await contracts.minePool.getUserLatestPremium(accounts[1],contracts.USDC.address);
         assert.equal(mineBalance.toNumber(),110000,"getMinerBalance error");
         await contracts.minePool.stakeFPTB(100000,12);
         await contracts.minePool.setTime(4500);
         for (var i=300;i<450;i++){
-            await contracts.minePool.distributePremium(i,10000);
+            await contracts.minePool.distributePremium(contracts.USDC.address,i,10000);
         }
-        mineBalance = await contracts.minePool.getUserLatestPremium(accounts[0]);
+        mineBalance = await contracts.minePool.getUserLatestPremium(accounts[0],contracts.USDC.address);
         assert.equal(mineBalance.toNumber(),110000,"getMinerBalance error");
-        mineBalance = await contracts.minePool.getUserLatestPremium(accounts[1]);
+        mineBalance = await contracts.minePool.getUserLatestPremium(accounts[1],contracts.USDC.address);
         assert.equal(mineBalance.toNumber(),110000,"getMinerBalance error");
     });
 });

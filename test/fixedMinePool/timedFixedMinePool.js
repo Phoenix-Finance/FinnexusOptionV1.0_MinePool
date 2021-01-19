@@ -156,7 +156,7 @@ contract('fixedMinePool_Timed', function (accounts){
         let contracts = await migrateTestMinePool(accounts);
         let nowId = await contracts.minePool.getCurrentPeriodID();
         console.log("getCurrentPeriodID : ",nowId.toNumber());
-        minePool = await fixedMinePool.new(contracts.CFNXA.address,contracts.CFNXB.address,contracts.USDC.address,100000);
+        minePool = await fixedMinePool.new(contracts.CFNXA.address,contracts.CFNXB.address,100000);
         contracts.minePool.setImplementation(minePool.address);
         await contracts.minePool.stakeFPTA(100000);
         await contracts.minePool.stakeFPTB(100000,2);

@@ -18,13 +18,11 @@ contract fixedMinePool is fixedMinePoolData {
      * @dev constructor.
      * @param FPTA FPT-A coin's address,staking coin
      * @param FPTB FPT-B coin's address,staking coin
-     * @param USDC USDC coin's address,premium coin
      * @param startTime the start time when this mine pool begin.
      */
-    constructor(address FPTA,address FPTB,address USDC,uint256 startTime)public{
+    constructor(address FPTA,address FPTB,uint256 startTime)public{
         _FPTA = FPTA;
         _FPTB = FPTB;
-        _premium = USDC;
         _startTime = startTime;
         initialize();
     }
@@ -46,13 +44,11 @@ contract fixedMinePool is fixedMinePoolData {
      * @dev setting function.
      * @param FPTA FPT-A coin's address,staking coin
      * @param FPTB FPT-B coin's address,staking coin
-     * @param USDC USDC coin's address,premium coin
      * @param startTime the start time when this mine pool begin.
      */
-    function setAddresses(address FPTA,address FPTB,address USDC,uint256 startTime) public onlyOwner {
+    function setAddresses(address FPTA,address FPTB,uint256 startTime) public onlyOwner {
         _FPTA = FPTA;
         _FPTB = FPTB;
-        _premium = USDC;
         _startTime = startTime;
     }
     /**
@@ -699,48 +695,62 @@ contract fixedMinePool is fixedMinePoolData {
     /**
      * @dev retrieve total distributed options premium.
      */
-    function getTotalPremium()public view returns(uint256){
-        return totalDistributedPremium;
+    function getTotalPremium(address premiumCoin)public view returns(uint256){
+        return premiumMap[premiumCoin].totalPremium;
     }
 
     /**
      * @dev user redeem his options premium rewards.
+     */
+    function redeemPremium()public nonReentrant notHalted {
+        for (uint256 i=0;i<premiumCoinList.length;i++){
+            address premiumCoin = premiumCoinList[i];
+            settlePremium(msg.sender,premiumCoin);
+            uint256 amount = premiumMap[premiumCoin].premiumBalance[msg.sender];
+            if (amount > 0){
+                premiumMap[premiumCoin].premiumBalance[msg.sender] = 0;
+                _redeem(msg.sender,premiumCoin,amount);
+                emit RedeemPremium(msg.sender,premiumCoin,amount);
+            }
+        }
+    }
+    /**
+     * @dev user redeem his options premium rewards.
      * @param amount redeem amount.
      */
-    function redeemPremium(uint256 amount)public nonReentrant notHalted {
+    function redeemPremiumCoin(address premiumCoin,uint256 amount)public nonReentrant notHalted {
         require(amount > 0,"redeem amount must be greater than zero");
-        settlePremium(msg.sender);
-        userPremiumBalance[msg.sender] = userPremiumBalance[msg.sender].sub(amount);
-        _redeem(msg.sender,_premium,amount);
-        emit RedeemPremium(msg.sender,amount);
+        settlePremium(msg.sender,premiumCoin);
+        premiumMap[premiumCoin].premiumBalance[msg.sender] = premiumMap[premiumCoin].premiumBalance[msg.sender].sub(amount);
+        _redeem(msg.sender,premiumCoin,amount);
+        emit RedeemPremium(msg.sender,premiumCoin,amount);
     }
-
 
     /**
      * @dev get user's premium balance.
      * @param account user's account
      */ 
-    function getUserLatestPremium(address account)public view returns(uint256){
-        return userPremiumBalance[account].add(_getUserPremium(account));
+    function getUserLatestPremium(address account,address premiumCoin)public view returns(uint256){
+        return premiumMap[premiumCoin].premiumBalance[account].add(_getUserPremium(account,premiumCoin));
     }
     /**
      * @dev the auxiliary function for getUserLatestPremium. Calculate latest time phase premium.
      */ 
-    function _getUserPremium(address account)internal view returns(uint256){
+    function _getUserPremium(address account,address premiumCoin)internal view returns(uint256){
         uint256 FPTBBalance = userInfoMap[account]._FPTBBalance;
         if (FPTBBalance > 0){
-            uint256 lastIndex = userLastPremiumIndex[account];
+            uint256 lastIndex = premiumMap[premiumCoin].lastPremiumIndex[account];
             uint256 nowIndex = getPeriodIndex(currentTime());
-            uint256 endIndex = lastIndex+_maxLoop < distributedPeriod.length ? lastIndex+_maxLoop : distributedPeriod.length;
+            uint256 endIndex = lastIndex+_maxLoop < premiumMap[premiumCoin].distributedPeriod.length ? lastIndex+_maxLoop : premiumMap[premiumCoin].distributedPeriod.length;
             uint256 LatestPremium = 0;
             for (; lastIndex< endIndex;lastIndex++){
-                uint256 periodID = distributedPeriod[lastIndex];
-                if (periodID == nowIndex || premiumMinedMap[periodID].totalPremiumDistribution == 0 ||
-                    premiumMinedMap[periodID].userPremiumDistribution[account] == 0){
+                uint256 periodID = premiumMap[premiumCoin].distributedPeriod[lastIndex];
+                if (periodID == nowIndex || premiumDistributionMap[periodID].totalPremiumDistribution == 0 ||
+                    premiumDistributionMap[periodID].userPremiumDistribution[account] == 0){
                     continue;
                 }
-                LatestPremium = LatestPremium.add(premiumMinedMap[periodID].totalMined.mul(premiumMinedMap[periodID].userPremiumDistribution[account]).div(
-                    premiumMinedMap[periodID].totalPremiumDistribution));
+                LatestPremium = LatestPremium.add(premiumMap[premiumCoin].periodPremium[periodID].mul(premiumDistributionMap[periodID].userPremiumDistribution[account]).div(
+                    premiumDistributionMap[periodID].totalPremiumDistribution));
             }        
             return LatestPremium;
         }
@@ -748,26 +758,30 @@ contract fixedMinePool is fixedMinePoolData {
     }
     /**
      * @dev Distribute premium from foundation.
+     * @param premiumCoin premium token address
      * @param periodID period ID
      * @param amount premium amount.
      */ 
-    function distributePremium(uint256 periodID,uint256 amount)public onlyOperator(0) {
-        amount = getPayableAmount(_premium,amount);
+    function distributePremium(address premiumCoin, uint256 periodID,uint256 amount)public onlyOperator(0) {
+        amount = getPayableAmount(premiumCoin,amount);
         require(amount > 0, 'Distribution amount is zero');
-        require(premiumMinedMap[periodID].totalMined == 0 , "This period is already distributed!");
+        require(premiumMap[premiumCoin].periodPremium[periodID] == 0 , "This period is already distributed!");
         uint256 nowIndex = getPeriodIndex(currentTime());
         require(nowIndex > periodID, 'This period is not finished');
-        premiumMinedMap[periodID].totalMined = amount;
-        totalDistributedPremium = totalDistributedPremium.add(amount);
-        distributedPeriod.push(uint64(periodID));
-        emit DistributePremium(msg.sender,periodID,amount);
+        whiteListAddress.addWhiteListAddress(premiumCoinList,premiumCoin);
+        premiumMap[premiumCoin].periodPremium[periodID] = amount;
+        premiumMap[premiumCoin].totalPremium = premiumMap[premiumCoin].totalPremium.add(amount);
+        premiumMap[premiumCoin].distributedPeriod.push(uint64(periodID));
+        emit DistributePremium(msg.sender,premiumCoin,periodID,amount);
     }
     /**
      * @dev Auxiliary function. Clear user's premium distribution amount.
      * @param account user's account.
      */ 
     function removePremiumDistribution(address account) internal {
-        settlePremium(account);
+        for (uint256 i=0;i<premiumCoinList.length;i++){
+            settlePremium(account,premiumCoinList[i]);
+        }
         uint256 beginTime = currentTime(); 
         uint256 nowId = getPeriodIndex(beginTime);
         uint256 endId = userInfoMap[account].maxPeriodID;
@@ -776,8 +790,8 @@ contract fixedMinePool is fixedMinePoolData {
             for(;nowId<endId;nowId++){
                 uint256 finishTime = getPeriodFinishTime(nowId);
                 uint256 periodDistribution = finishTime.sub(beginTime).mul(FPTBBalance);
-                premiumMinedMap[nowId].totalPremiumDistribution = premiumMinedMap[nowId].totalPremiumDistribution.sub(periodDistribution);
-                premiumMinedMap[nowId].userPremiumDistribution[account] = premiumMinedMap[nowId].userPremiumDistribution[account].sub(periodDistribution);
+                premiumDistributionMap[nowId].totalPremiumDistribution = premiumDistributionMap[nowId].totalPremiumDistribution.sub(periodDistribution);
+                premiumDistributionMap[nowId].userPremiumDistribution[account] = premiumDistributionMap[nowId].userPremiumDistribution[account].sub(periodDistribution);
                 beginTime = finishTime;
             }
         }
@@ -786,9 +800,9 @@ contract fixedMinePool is fixedMinePoolData {
      * @dev Auxiliary function. Calculate and record user's premium.
      * @param account user's account.
      */ 
-    function settlePremium(address account)internal{
-        userPremiumBalance[account] = userPremiumBalance[account].add(getUserLatestPremium(account));
-        userLastPremiumIndex[msg.sender] = distributedPeriod.length;
+    function settlePremium(address account,address premiumCoin)internal{
+        premiumMap[premiumCoin].premiumBalance[account] = premiumMap[premiumCoin].premiumBalance[account].add(getUserLatestPremium(account,premiumCoin));
+        premiumMap[premiumCoin].lastPremiumIndex[account] = premiumMap[premiumCoin].distributedPeriod.length;
     }
     /**
      * @dev Auxiliary function. Add user's premium distribution amount.
@@ -802,8 +816,8 @@ contract fixedMinePool is fixedMinePoolData {
         for(;nowId<endId;nowId++){
             uint256 finishTime = getPeriodFinishTime(nowId);
             uint256 periodDistribution = finishTime.sub(beginTime).mul(FPTBBalance);
-            premiumMinedMap[nowId].totalPremiumDistribution = premiumMinedMap[nowId].totalPremiumDistribution.add(periodDistribution);
-            premiumMinedMap[nowId].userPremiumDistribution[account] = premiumMinedMap[nowId].userPremiumDistribution[account].add(periodDistribution);
+            premiumDistributionMap[nowId].totalPremiumDistribution = premiumDistributionMap[nowId].totalPremiumDistribution.add(periodDistribution);
+            premiumDistributionMap[nowId].userPremiumDistribution[account] = premiumDistributionMap[nowId].userPremiumDistribution[account].add(periodDistribution);
             beginTime = finishTime;
         }
 
