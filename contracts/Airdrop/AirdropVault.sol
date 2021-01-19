@@ -145,6 +145,21 @@ contract AirDropVault is AirDropVaultData {
             tokenWhiteList[_tokens[i]] = _minBalForFreeClaim[i];
         }
     }
+    
+    function getClaimableAirDropFnx(address _targetToken,address account) public view airdropinited returns(uint256){
+        require(tokenWhiteList[_targetToken]>0,"the target token is not set active");
+        require(now >= claimBeginTime,"claim not begin");
+        require(now < claimEndTime,"claim finished");
+        
+        if(!freeClaimedUserList[_targetToken][account]) {
+            uint256 bal = ITargetToken(_targetToken).balanceOf(account);
+            if(bal>=tokenWhiteList[_targetToken]) {
+                return fnxPerFreeClaimUser;
+            }
+        }
+        
+        return 0;
+    }
 
     function freeClaim(address _targetToken) public airdropinited {
         require(tokenWhiteList[_targetToken]>0,"the target token is not set active");
