@@ -193,23 +193,21 @@ contract fixedMinePool is fixedMinePoolData {
     /**
      * @dev user redeem mine rewards.
      * @param mineCoin mine coin address
-     * @param amount redeem amount.
      */
-    function redeemMinerCoin(address mineCoin,uint256 amount)public nonReentrant notHalted {
+    function redeemMinerCoin(address mineCoin)public nonReentrant notHalted {
         _mineSettlement(mineCoin);
         _settleUserMine(mineCoin,msg.sender);
-        _redeemMineCoin(mineCoin,msg.sender,amount);
+        _redeemMineCoin(mineCoin,msg.sender);
     }
     /**
      * @dev subfunction for user redeem mine rewards.
      * @param mineCoin mine coin address
      * @param recieptor recieptor's account
-     * @param amount redeem amount.
      */
-    function _redeemMineCoin(address mineCoin,address payable recieptor,uint256 amount) internal {
-        require (amount > 0,"input amount must more than zero!");
-        userInfoMap[recieptor].minerBalances[mineCoin] = 
-            userInfoMap[recieptor].minerBalances[mineCoin].sub(amount);
+    function _redeemMineCoin(address mineCoin,address payable recieptor) internal {
+        uint256 amount = userInfoMap[recieptor].minerBalances[mineCoin];
+        require (amount > 0,"redeem amount must more than zero!");
+        userInfoMap[recieptor].minerBalances[mineCoin] = 0;
         _redeem(recieptor,mineCoin,amount);
         emit RedeemMineCoin(recieptor,mineCoin,amount);
     }
@@ -550,14 +548,19 @@ contract fixedMinePool is fixedMinePoolData {
     function stakeFPTB(uint256 amount,uint256 lockedPeriod)public validPeriod(lockedPeriod) nonReentrant notHalted{
         uint256 curPeriod = getPeriodIndex(currentTime());
         require(curPeriod+lockedPeriod-1>=userInfoMap[msg.sender].maxPeriodID, "lockedPeriod cannot be smaller than current locked period");
+        if(userInfoMap[msg.sender].maxPeriodID<curPeriod && lockedPeriod == 1){
+            require(getPeriodFinishTime(getCurrentPeriodID()+lockedPeriod)>currentTime() + 15 days, 'locked time must geater than 15 days');
+        }
         amount = getPayableAmount(_FPTB,amount);
         require(amount > 0, 'stake amount is zero');
         removeDistribution(msg.sender);
         userInfoMap[msg.sender]._FPTBBalance = userInfoMap[msg.sender]._FPTBBalance.add(amount);
         if (lockedPeriod == 0){
             userInfoMap[msg.sender].maxPeriodID = 0;
+            userInfoMap[msg.sender].lockedExpired = currentTime().add(_flexibleExpired);
         }else{
             userInfoMap[msg.sender].maxPeriodID = curPeriod+lockedPeriod-1;
+            userInfoMap[msg.sender].lockedExpired = getPeriodFinishTime(curPeriod+lockedPeriod-1);
         }
         addDistribution(msg.sender);
         emit StakeFPTB(msg.sender,amount,lockedPeriod);
@@ -601,8 +604,10 @@ contract fixedMinePool is fixedMinePoolData {
         removeDistribution(msg.sender); 
         if (lockedPeriod == 0){
             userInfoMap[msg.sender].maxPeriodID = 0;
+            userInfoMap[msg.sender].lockedExpired = currentTime().add(_flexibleExpired);
         }else{
             userInfoMap[msg.sender].maxPeriodID = curPeriod+lockedPeriod-1;
+            userInfoMap[msg.sender].lockedExpired = getPeriodFinishTime(curPeriod+lockedPeriod-1);
         }
         addDistribution(msg.sender);
         emit ChangeLockedPeriod(msg.sender,lockedPeriod);
@@ -650,16 +655,10 @@ contract fixedMinePool is fixedMinePoolData {
      */
     function addDistribution(address account) internal {
         uint256 distri = calculateDistribution(account);
-        if (userInfoMap[account].maxPeriodID == 0){
-            //flexible mined
-            userInfoMap[account].lockedExpired = currentTime().add(_flexibleExpired);
-        }else{
-            uint256 nowId = getPeriodIndex(currentTime());
-            uint256 endId = userInfoMap[account].maxPeriodID;
-            for(;nowId<=endId;nowId++){
-                weightDistributionMap[nowId] = weightDistributionMap[nowId].add(distri.mul(getPeriodWeight(nowId,endId)-1000)/1000);
-            }
-            userInfoMap[account].lockedExpired = getPeriodFinishTime(endId);
+        uint256 nowId = getPeriodIndex(currentTime());
+        uint256 endId = userInfoMap[account].maxPeriodID;
+        for(;nowId<=endId;nowId++){
+            weightDistributionMap[nowId] = weightDistributionMap[nowId].add(distri.mul(getPeriodWeight(nowId,endId)-1000)/1000);
         }
         userInfoMap[account].distribution =  distri;
         totalDistribution = totalDistribution.add(distri);
@@ -704,11 +703,12 @@ contract fixedMinePool is fixedMinePoolData {
 
     /**
      * @dev user redeem his options premium rewards.
-     * @param amount redeem amount.
      */
-    function redeemPremium(uint256 amount)public nonReentrant notHalted {
+    function redeemPremium()public nonReentrant notHalted {
         settlePremium(msg.sender);
-        userPremiumBalance[msg.sender] = userPremiumBalance[msg.sender].sub(amount);
+        uint256 amount = userPremiumBalance[msg.sender];
+        require(amount > 0,"redeem amount must be greater than zero");
+        userPremiumBalance[msg.sender] = 0;
         _redeem(msg.sender,_premium,amount);
         emit RedeemPremium(msg.sender,amount);
     }
@@ -819,9 +819,6 @@ contract fixedMinePool is fixedMinePoolData {
      */
     modifier validPeriod(uint256 period){
         require(period >= 0 && period <= _maxPeriod, 'locked period must be in valid range');
-        if(period == 1){
-            require(getPeriodFinishTime(getCurrentPeriodID()+period)>currentTime() + 15 days, 'locked time must geater than 15 days');
-        }
         _;
     }
     /**
