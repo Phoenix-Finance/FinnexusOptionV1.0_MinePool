@@ -146,7 +146,7 @@ contract AirDropVault is AirDropVaultData {
         }
     }
     
-    function getClaimableAirDropFnx(address _targetToken,address account) public view airdropinited returns(uint256){
+    function balanceOfFreeClaimAirDrop(address _targetToken,address account) public view airdropinited returns(uint256){
         require(tokenWhiteList[_targetToken]>0,"the target token is not set active");
         require(now >= claimBeginTime,"claim not begin");
         require(now < claimEndTime,"claim finished");

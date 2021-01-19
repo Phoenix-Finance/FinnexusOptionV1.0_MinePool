@@ -8,7 +8,7 @@ contract AirDropVaultProxy is AirDropVaultData,baseProxy {
     constructor (address implementation_) baseProxy(implementation_) public{
     }
     
-    function balanceOfWhitListUser(address _account) public view returns (uint256)  {
+    function balanceOfWhitListUser(address /*_account*/) public view returns (uint256)  {
         delegateToViewAndReturn();   
     }
     
@@ -48,7 +48,7 @@ contract AirDropVaultProxy is AirDropVaultData,baseProxy {
          delegateAndReturn();
     }
     
-    function getClaimableAirDropFnx(address/* _targetToken*/,address/* account*/) public view returns(uint256) {
+    function balanceOfFreeClaimAirDrop(address/* _targetToken*/,address/* account*/) public view returns(uint256) {
           delegateToViewAndReturn();
     }
     
