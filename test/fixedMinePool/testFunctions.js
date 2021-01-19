@@ -9,8 +9,8 @@ exports.migrateNormalMinePool =  async function (accounts){
     let USDC = await CFNX.new();
     let Mine = await CFNX.new();
     let startTime = 10000000;
-    let minePoolImpl = await fMinePool.new(CFNXA.address,CFNXB.address,USDC.address,startTime);
-    let minePool = await minePoolProxy.new(minePoolImpl.address,CFNXA.address,CFNXB.address,USDC.address,startTime);
+    let minePoolImpl = await fMinePool.new(CFNXA.address,CFNXB.address,startTime);
+    let minePool = await minePoolProxy.new(minePoolImpl.address,CFNXA.address,CFNXB.address,startTime);
     await CFNXA.mint(accounts[0],1000000000000000);
     await CFNXA.approve(minePool.address,1000000000000000);
     await CFNXB.mint(accounts[0],1000000000000000);
@@ -39,8 +39,8 @@ exports.migrateTestMinePool =  async function (accounts){
     let USDC = await CFNX.new();
     let Mine = await CFNX.new();
     let startTime = 10000000;
-    let minePoolImpl = await fixedMinePool.new(CFNXA.address,CFNXB.address,USDC.address,startTime);
-    let minePool = await minePoolProxy.new(minePoolImpl.address,CFNXA.address,CFNXB.address,USDC.address,startTime);
+    let minePoolImpl = await fixedMinePool.new(CFNXA.address,CFNXB.address,startTime);
+    let minePool = await minePoolProxy.new(minePoolImpl.address,CFNXA.address,CFNXB.address,startTime);
     await CFNXA.mint(accounts[0],1000000000000000);
     await CFNXA.approve(minePool.address,1000000000000000);
     await CFNXB.mint(accounts[0],1000000000000000);
@@ -69,8 +69,8 @@ exports.migrateTimedMinePool =  async function (accounts){
     let USDC = await CFNX.new();
     let Mine = await CFNX.new();
     let startTime = 10000000;
-    let minePoolImpl = await fixedMinePool_Timed.new(CFNXA.address,CFNXB.address,USDC.address,startTime);
-    let minePool = await minePoolProxy.new(minePoolImpl.address,CFNXA.address,CFNXB.address,USDC.address,startTime);
+    let minePoolImpl = await fixedMinePool_Timed.new(CFNXA.address,CFNXB.address,startTime);
+    let minePool = await minePoolProxy.new(minePoolImpl.address,CFNXA.address,CFNXB.address,startTime);
     await CFNXA.mint(accounts[0],1000000000000000);
     await CFNXA.approve(minePool.address,1000000000000000);
     
@@ -103,6 +103,7 @@ function calculateWeightDistribution(distribution,getId,maxId){
     }
     return distribution *(maxId-getId+4);
 }
+
 exports.checkUserDistribution =  async function (contracts,account){
     let fptA = await contracts.minePool.getUserFPTABalance(account);
     let fptB = await contracts.minePool.getUserFPTBBalance(account);

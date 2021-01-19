@@ -40,8 +40,6 @@ contract fixedMinePoolData is initializable,Operator,Halt,AddressWhiteList,Reent
     uint256 constant internal periodWeight = 1000;
     uint256 constant internal baseWeight = 5000;
 
-    //options premium address.
-    address internal _premium;
     // FPT-A address
     address internal _FPTA;
     // FPT-B address
@@ -92,23 +90,28 @@ contract fixedMinePoolData is initializable,Operator,Halt,AddressWhiteList,Reent
     //total Distribution
     uint256 internal totalDistribution;
 
-    struct premiumMined {
+    struct premiumDistribution {
         //total premium distribution in each period
         uint256 totalPremiumDistribution;
         //User's premium distribution in each period
         mapping(address=>uint256) userPremiumDistribution;
-        //total premium distributed by owner in each period.
-        uint256 totalMined;
+
     }
-    //period id list which is already distributed by owner.
-    uint64[] internal distributedPeriod;
-    //total permium distributed by owner.
-    uint256 internal totalDistributedPremium;
     // premium mining info in each period.
-    mapping(uint256=>premiumMined) internal premiumMinedMap;
+    mapping(uint256=>premiumDistribution) internal premiumDistributionMap;
     //user's latest redeemed period index in the distributedPeriod list.
-    mapping(address=>uint256) internal userLastPremiumIndex;
-    mapping(address=>uint256) internal userPremiumBalance;
+    struct premiumInfo {
+        mapping(address=>uint256) lastPremiumIndex;
+        mapping(address=>uint256) premiumBalance;
+        //period id list which is already distributed by owner.
+        uint64[] distributedPeriod;
+        //total permium distributed by owner.
+        uint256 totalPremium;
+        //total premium distributed by owner in each period.
+        mapping(uint256=>uint256) periodPremium;
+    }
+    mapping(address=>premiumInfo) internal premiumMap;
+    address[] internal premiumCoinList;
 
     /**
      * @dev Emitted when `account` stake `amount` FPT-A coin.
@@ -137,11 +140,11 @@ contract fixedMinePoolData is initializable,Operator,Halt,AddressWhiteList,Reent
     /**
      * @dev Emitted when owner `account` distribute `amount` premium in `periodID` period.
      */
-    event DistributePremium(address indexed account,uint256 indexed periodID,uint256 amount);
+    event DistributePremium(address indexed account,address indexed premiumCoin,uint256 indexed periodID,uint256 amount);
     /**
      * @dev Emitted when `account` redeem `amount` premium.
      */
-    event RedeemPremium(address indexed account,uint256 amount);
+    event RedeemPremium(address indexed account,address indexed premiumCoin,uint256 amount);
 
     /**
      * @dev Emitted when `account` redeem `value` mineCoins.
