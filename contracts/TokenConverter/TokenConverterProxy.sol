@@ -19,12 +19,17 @@ contract TokenConverterProxy is TokenConverterData,baseProxy {
          delegateToViewAndReturn();     
    }
    
+   
    function inputCfnxForInstallmentPay(uint256 /*amount*/) public {
          delegateAndReturn();     
    }
    
    function claimFnxExpiredReward() public {
         delegateAndReturn(); 
+   }
+   
+   function getClaimAbleBalance() public view returns (uint256) {
+        delegateToViewAndReturn();     
    }
     
 }
