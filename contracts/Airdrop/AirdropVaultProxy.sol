@@ -60,8 +60,17 @@ contract AirDropVaultProxy is AirDropVaultData,baseProxy {
          delegateAndReturn();
     }
     
-     function sushiMineClaim() external {
+    function sushiMineClaim() external {
           delegateAndReturn();
-     }
+    }
+    
+    function balanceOfAirDrop(address /*_account*/) public view returns(uint256){
+          delegateToViewAndReturn();      
+    }
+    
+    function claimAirdrop() public{
+          delegateAndReturn();
+    }
+    
     
 }

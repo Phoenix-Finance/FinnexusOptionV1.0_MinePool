@@ -101,8 +101,13 @@ contract AirDropVault is AirDropVaultData {
      * @dev Retrieve user's locked balance. 
      * @param _account user's account.
      */ 
-    function balanceOfWhitListUser(address _account) public view returns (uint256) {
-        return userWhiteList[_account];
+    function balanceOfWhitListUser(address _account) private view returns (uint256) {
+        uint256 amount = userWhiteList[_account];
+        uint256 total = totalWhiteListClaimed.add(amount);
+        if (total>maxWhiteListFnxAirDrop){
+            amount = maxWhiteListFnxAirDrop.sub(totalWhiteListClaimed);
+        }
+        return amount;
     }
 
 
@@ -118,43 +123,59 @@ contract AirDropVault is AirDropVaultData {
     
     
     function whitelistClaim() public airdropinited {
-        require(userWhiteList[msg.sender]>0,"user balance is not enough");
+       
         require(now >= claimBeginTime,"claim not begin");
         require(now < claimEndTime,"claim finished");
         
-        uint256 amount = userWhiteList[msg.sender];
-        userWhiteList[msg.sender] = 0;
-        totalWhiteListClaimed = totalWhiteListClaimed.add(amount);
-        require(totalWhiteListClaimed<=maxWhiteListFnxAirDrop,"total claim amount over max whitelist airdrop");
+         if(userWhiteList[msg.sender]>0) {
         
-        IERC20(fnxToken).approve(optionColPool,amount);
-        uint256 prefptb = IERC20(ftpbToken).balanceOf(address(this));
-        IOptionMgrPoxy(optionColPool).addCollateral(fnxToken,amount);
-        uint256 afterftpb = IERC20(ftpbToken).balanceOf(address(this));
-        uint256 ftpbnum = afterftpb.sub(prefptb);
-        IERC20(ftpbToken).approve(minePool,ftpbnum);
+            uint256 amount = userWhiteList[msg.sender];
+            userWhiteList[msg.sender] = 0;
+            if(totalWhiteListClaimed>maxWhiteListFnxAirDrop) {
+                return;
+            } else {
+                uint256 total = totalWhiteListClaimed.add(amount);
+                if (total>maxWhiteListFnxAirDrop){
+                    amount = maxWhiteListFnxAirDrop.sub(totalWhiteListClaimed);
+                }
+                totalWhiteListClaimed = totalWhiteListClaimed.add(amount);
+                
+                IERC20(fnxToken).approve(optionColPool,amount);
+                uint256 prefptb = IERC20(ftpbToken).balanceOf(address(this));
+                IOptionMgrPoxy(optionColPool).addCollateral(fnxToken,amount);
+                uint256 afterftpb = IERC20(ftpbToken).balanceOf(address(this));
+                uint256 ftpbnum = afterftpb.sub(prefptb);
+                IERC20(ftpbToken).approve(minePool,ftpbnum);
+                
+                IMinePool(minePool).lockAirDrop(msg.sender,ftpbnum);
         
-        IMinePool(minePool).lockAirDrop(msg.sender,ftpbnum);
-
-        emit WhiteListClaim(msg.sender,amount,ftpbnum);
+                emit WhiteListClaim(msg.sender,amount,ftpbnum);
+            }
+         }
     }
     
     function setTokenList(address[] memory _tokens,uint256[] memory _minBalForFreeClaim) public onlyOwner {
         uint256 i = 0;
         for(i=0;i<_tokens.length;i++) {
-            tokenWhiteList[_tokens[i]] = _minBalForFreeClaim[i];
+            tkBalanceRequire[_tokens[i]] = _minBalForFreeClaim[i];
+            tokenWhiteList.push(_tokens[i]);
         }
     }
     
-    function balanceOfFreeClaimAirDrop(address _targetToken,address account) public view airdropinited returns(uint256){
-        require(tokenWhiteList[_targetToken]>0,"the target token is not set active");
+    function balanceOfFreeClaimAirDrop(address _targetToken,address _account) public view airdropinited returns(uint256){
+        require(tkBalanceRequire[_targetToken]>0,"the target token is not set active");
         require(now >= claimBeginTime,"claim not begin");
         require(now < claimEndTime,"claim finished");
         
-        if(!freeClaimedUserList[_targetToken][account]) {
-            uint256 bal = ITargetToken(_targetToken).balanceOf(account);
-            if(bal>=tokenWhiteList[_targetToken]) {
-                return fnxPerFreeClaimUser;
+        if(!freeClaimedUserList[_targetToken][_account]) {
+            uint256 bal = ITargetToken(_targetToken).balanceOf(_account);
+            if(bal>=tkBalanceRequire[_targetToken]) {
+                uint256 amount = fnxPerFreeClaimUser;
+                uint256 total = totalFreeClaimed.add(amount);
+                if(total>totalFreeClaimed) {
+                    amount = maxFreeFnxAirDrop.sub(totalFreeClaimed);
+                }
+                return amount;
             }
         }
         
@@ -162,29 +183,41 @@ contract AirDropVault is AirDropVaultData {
     }
 
     function freeClaim(address _targetToken) public airdropinited {
-        require(tokenWhiteList[_targetToken]>0,"the target token is not set active");
+        require(tkBalanceRequire[_targetToken]>0,"the target token is not set active");
         require(now >= claimBeginTime,"claim not begin");
         require(now < claimEndTime,"claim finished");
-        require(!freeClaimedUserList[_targetToken][msg.sender],"user claimed airdrop already");
-  
         
-        uint256 bal = ITargetToken(_targetToken).balanceOf(msg.sender);
-        require(bal>=tokenWhiteList[_targetToken],"user balance in target token is not reach minum require");
-        
-        totalFreeClaimed = totalFreeClaimed.add(fnxPerFreeClaimUser);
-        require(totalFreeClaimed<=maxFreeFnxAirDrop,"total claim amount over max free claim airdrop");
-        
-        IERC20(fnxToken).approve(optionColPool,fnxPerFreeClaimUser);
-        
-        uint256 prefptb = IERC20(ftpbToken).balanceOf(address(this));
-        IOptionMgrPoxy(optionColPool).addCollateral(fnxToken,fnxPerFreeClaimUser);
-        uint256 afterftpb = IERC20(ftpbToken).balanceOf(address(this));
-        uint256 ftpbnum = afterftpb.sub(prefptb);
-        
-        IERC20(ftpbToken).approve(minePool,ftpbnum);
-        IMinePool(minePool).lockAirDrop(msg.sender,ftpbnum);
-
-        emit UserFreeClaim(msg.sender,fnxPerFreeClaimUser,ftpbnum);
+        if(!freeClaimedUserList[_targetToken][msg.sender]) {
+            //set user claimed already
+            freeClaimedUserList[_targetToken][msg.sender] = true;
+            
+            uint256 bal = ITargetToken(_targetToken).balanceOf(msg.sender);
+            if(bal>=tkBalanceRequire[_targetToken]){
+                uint256 amount = fnxPerFreeClaimUser;
+                
+                if(totalFreeClaimed>maxFreeFnxAirDrop) {
+                    return;
+                } else {
+                    uint256 total = totalFreeClaimed.add(amount);
+                    if(total>totalFreeClaimed) {
+                        amount = maxFreeFnxAirDrop.sub(totalFreeClaimed);
+                    }
+                    totalFreeClaimed = totalFreeClaimed.add(amount);
+                    
+                    IERC20(fnxToken).approve(optionColPool,amount);
+                    
+                    uint256 prefptb = IERC20(ftpbToken).balanceOf(address(this));
+                    IOptionMgrPoxy(optionColPool).addCollateral(fnxToken,amount);
+                    uint256 afterftpb = IERC20(ftpbToken).balanceOf(address(this));
+                    uint256 ftpbnum = afterftpb.sub(prefptb);
+                    
+                    IERC20(ftpbToken).approve(minePool,ftpbnum);
+                    IMinePool(minePool).lockAirDrop(msg.sender,ftpbnum);
+                    
+                    emit UserFreeClaim(msg.sender,amount,ftpbnum);
+                }
+            }
+        }
     }   
     
    
@@ -215,6 +248,25 @@ contract AirDropVault is AirDropVaultData {
         uint256 cfncnum = precfnx.sub(aftercfnc);
         require(cfncnum==amount,"transfer balance is wrong");
         emit SushiMineClaim(msg.sender,amount);
+    }
+    
+    function balanceOfAirDrop(address _account) public view returns(uint256){
+        uint256 whitelsBal = balanceOfWhitListUser(_account);
+        uint256 i = 0;
+        uint256 freeClaimBal = 0;
+        for(i=0;i<tokenWhiteList.length;i++) {
+           freeClaimBal = freeClaimBal.add(balanceOfFreeClaimAirDrop(_account,tokenWhiteList[i]));
+        }
+        
+        return whitelsBal.add(freeClaimBal);
+    }
+    
+    function claimAirdrop() public {
+         whitelistClaim();
+         uint256 i;
+         for(i=0;i<tokenWhiteList.length;i++) {
+            freeClaim(tokenWhiteList[i]);
+         }
     }
       
 }

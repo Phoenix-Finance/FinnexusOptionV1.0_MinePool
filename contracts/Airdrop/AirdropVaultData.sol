@@ -26,7 +26,9 @@ contract AirDropVaultData is Operator,Halt {
     //users in white list airdrop
     mapping (address => uint256) public userWhiteList;
     //target airdrop token list address=>min balance require
-    mapping (address => uint256)  public tokenWhiteList;
+    mapping (address => uint256)  public tkBalanceRequire;
+    address[] public tokenWhiteList;
+    
     //the user which is claimed already for different token
     mapping (address=>mapping(address => bool)) public freeClaimedUserList;
     
