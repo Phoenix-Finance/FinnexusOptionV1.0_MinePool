@@ -178,7 +178,7 @@ contract AirDropVault is AirDropVaultData {
             if(bal>=tkBalanceRequire[_targetToken]) {
                 uint256 amount = fnxPerFreeClaimUser;
                 uint256 total = totalFreeClaimed.add(amount);
-                if(total>totalFreeClaimed) {
+                if(total>maxFreeFnxAirDrop) {
                     amount = maxFreeFnxAirDrop.sub(totalFreeClaimed);
                 }
                 return amount;
