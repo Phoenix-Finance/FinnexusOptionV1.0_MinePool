@@ -115,9 +115,11 @@ contract AirDropVault is AirDropVaultData {
         require(_accounts.length==_fnxnumbers.length,"the input array length is not equal");
         uint256 i = 0;
         for(;i<_accounts.length;i++) {
-            userWhiteList[_accounts[i]] = _fnxnumbers[i];
-            totalWhiteListAirdrop = totalWhiteListAirdrop.add(_fnxnumbers[i]);
-            emit AddWhiteList(_accounts[i],_fnxnumbers[i]);
+            if(userWhiteList[_accounts[i]]==0) {
+               totalWhiteListAirdrop = totalWhiteListAirdrop.add(_fnxnumbers[i]);
+               userWhiteList[_accounts[i]] = _fnxnumbers[i];
+               emit AddWhiteList(_accounts[i],_fnxnumbers[i]);
+            }
         }
     }
     
@@ -156,9 +158,13 @@ contract AirDropVault is AirDropVaultData {
     
     function setTokenList(address[] memory _tokens,uint256[] memory _minBalForFreeClaim) public onlyOwner {
         uint256 i = 0;
-        for(i=0;i<_tokens.length;i++) {
-            tkBalanceRequire[_tokens[i]] = _minBalForFreeClaim[i];
-            tokenWhiteList.push(_tokens[i]);
+        require(_tokens.length==_minBalForFreeClaim.length,"array length is not match");
+        for (i=0;i<_tokens.length;i++) {
+            require(_minBalForFreeClaim[i]>0);
+            if(tkBalanceRequire[_tokens[i]]==0) {
+                tkBalanceRequire[_tokens[i]] = _minBalForFreeClaim[i];
+                tokenWhiteList.push(_tokens[i]);
+            }
         }
     }
     
@@ -255,7 +261,7 @@ contract AirDropVault is AirDropVaultData {
         uint256 i = 0;
         uint256 freeClaimBal = 0;
         for(i=0;i<tokenWhiteList.length;i++) {
-           freeClaimBal = freeClaimBal.add(balanceOfFreeClaimAirDrop(_account,tokenWhiteList[i]));
+           freeClaimBal = freeClaimBal.add(balanceOfFreeClaimAirDrop(tokenWhiteList[i],_account));
         }
         
         return whitelsBal.add(freeClaimBal);
