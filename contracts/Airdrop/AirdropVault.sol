@@ -205,7 +205,7 @@ contract AirDropVault is AirDropVaultData {
                     return;
                 } else {
                     uint256 total = totalFreeClaimed.add(amount);
-                    if(total>totalFreeClaimed) {
+                    if(total>maxFreeFnxAirDrop) {
                         amount = maxFreeFnxAirDrop.sub(totalFreeClaimed);
                     }
                     totalFreeClaimed = totalFreeClaimed.add(amount);
