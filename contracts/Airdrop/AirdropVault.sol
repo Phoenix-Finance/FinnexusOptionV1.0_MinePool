@@ -116,6 +116,18 @@ contract AirDropVault is AirDropVaultData {
         uint256 bal =  IERC20(fnxToken).balanceOf(address(this));
         IERC20(fnxToken).transfer(_reciever,bal);
     }  
+    
+    /**
+     * reset token setting in case of setting is wrong
+     */
+    function resetTokenList()  public onlyOwner {
+        uint256 i;
+        for(i=0;i<tokenWhiteList.length;i++) {
+            delete tkBalanceRequire[tokenWhiteList[i]];
+        }
+        
+        tokenWhiteList.length = 0;
+    }     
 
     /**
      * @dev Retrieve user's locked balance. 
