@@ -43,7 +43,7 @@ contract AirDropVault is AirDropVaultData {
     function initialize() onlyOwner public {}
     
     function update() onlyOwner public{ 
-        totalFreeClaimed = 0;
+        //totalFreeClaimed = 0;
     }
     
     function initAirdrop( address _optionColPool,
@@ -104,12 +104,20 @@ contract AirDropVault is AirDropVaultData {
      * @param _account user's account.
      */ 
     function balanceOfWhitListUser(address _account) private view returns (uint256) {
-        uint256 amount = userWhiteList[_account];
-        uint256 total = totalWhiteListClaimed.add(amount);
-        if (total>maxWhiteListFnxAirDrop){
-            amount = maxWhiteListFnxAirDrop.sub(totalWhiteListClaimed);
+        
+        if(totalWhiteListClaimed < maxWhiteListFnxAirDrop) {
+            uint256 amount = userWhiteList[_account];
+            uint256 total = totalWhiteListClaimed.add(amount);
+            
+            if (total>maxWhiteListFnxAirDrop){
+                amount = maxWhiteListFnxAirDrop.sub(totalWhiteListClaimed);
+            }
+            
+            return amount;
         }
-        return amount;
+        
+        return 0;
+       
     }
 
 
@@ -127,17 +135,15 @@ contract AirDropVault is AirDropVaultData {
     
     
     function whitelistClaim() public airdropinited {
-       
         require(now >= claimBeginTime,"claim not begin");
         require(now < claimEndTime,"claim finished");
-        
-         if(userWhiteList[msg.sender]>0) {
-        
-            uint256 amount = userWhiteList[msg.sender];
-            userWhiteList[msg.sender] = 0;
-            if(totalWhiteListClaimed>maxWhiteListFnxAirDrop) {
-                return;
-            } else {
+
+        if(totalWhiteListClaimed < maxWhiteListFnxAirDrop) {
+          
+           if(userWhiteList[msg.sender]>0) {
+               
+                uint256 amount = userWhiteList[msg.sender];
+                userWhiteList[msg.sender] = 0;
                 uint256 total = totalWhiteListClaimed.add(amount);
                 if (total>maxWhiteListFnxAirDrop){
                     amount = maxWhiteListFnxAirDrop.sub(totalWhiteListClaimed);
@@ -197,16 +203,14 @@ contract AirDropVault is AirDropVaultData {
         require(now < claimEndTime,"claim finished");
         
         if(!freeClaimedUserList[_targetToken][msg.sender]) {
-            //set user claimed already
-            freeClaimedUserList[_targetToken][msg.sender] = true;
-            
-            uint256 bal = ITargetToken(_targetToken).balanceOf(msg.sender);
-            if(bal>=tkBalanceRequire[_targetToken]){
-                uint256 amount = fnxPerFreeClaimUser;
+           if(totalFreeClaimed < maxFreeFnxAirDrop) {
+                //set user claimed already
+                freeClaimedUserList[_targetToken][msg.sender] = true;
+                uint256 bal = ITargetToken(_targetToken).balanceOf(msg.sender);
+                if(bal>=tkBalanceRequire[_targetToken]){
+                    uint256 amount = fnxPerFreeClaimUser;
                 
-                if(totalFreeClaimed>maxFreeFnxAirDrop) {
-                    return;
-                } else {
+ 
                     uint256 total = totalFreeClaimed.add(amount);
                     if(total>maxFreeFnxAirDrop) {
                         amount = maxFreeFnxAirDrop.sub(totalFreeClaimed);
