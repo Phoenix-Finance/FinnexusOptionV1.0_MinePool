@@ -172,19 +172,20 @@ contract AirDropVault is AirDropVaultData {
         require(tkBalanceRequire[_targetToken]>0,"the target token is not set active");
         require(now >= claimBeginTime,"claim not begin");
         require(now < claimEndTime,"claim finished");
-        
-        if(!freeClaimedUserList[_targetToken][_account]) {
-            uint256 bal = ITargetToken(_targetToken).balanceOf(_account);
-            if(bal>=tkBalanceRequire[_targetToken]) {
-                uint256 amount = fnxPerFreeClaimUser;
-                uint256 total = totalFreeClaimed.add(amount);
-                if(total>maxFreeFnxAirDrop) {
-                    amount = maxFreeFnxAirDrop.sub(totalFreeClaimed);
+        if(totalFreeClaimed < maxFreeFnxAirDrop) {
+            if(!freeClaimedUserList[_targetToken][_account]) {
+                uint256 bal = ITargetToken(_targetToken).balanceOf(_account);
+                if(bal>=tkBalanceRequire[_targetToken]) {
+                    uint256 amount = fnxPerFreeClaimUser;
+                    uint256 total = totalFreeClaimed.add(amount);
+                    if(total>maxFreeFnxAirDrop) {
+                        amount = maxFreeFnxAirDrop.sub(totalFreeClaimed);
+                    }
+                    return amount;
                 }
-                return amount;
             }
         }
-        
+
         return 0;
     }
 
