@@ -46,6 +46,18 @@ contract AirDropVault is AirDropVaultData {
         //totalFreeClaimed = 0;
     }
     
+    
+    /**
+     * @dev init function,init air drop
+     * @param _optionColPool  the option collateral contract address
+     * @param _fnxToken  the fnx token address
+     * @param _ftpbToken the ftpb token address
+     * @param _claimBeginTime the start time for airdrop
+     * @param _claimEndTime  the end time for airdrop
+     * @param _fnxPerFreeClaimUser the fnx amo for each person in airdrop
+     * @param _maxFreeFnxAirDrop the max fnx amount for free claimer from hegic,curve
+     * @param _maxWhiteListFnxAirDrop the mx fnx number in whitelist ways
+     */
     function initAirdrop( address _optionColPool,
                                 address _minePool,
                                 address _fnxToken,
@@ -80,6 +92,12 @@ contract AirDropVault is AirDropVaultData {
             maxWhiteListFnxAirDrop = _maxWhiteListFnxAirDrop;
     }
     
+    /**
+     * @dev init function,init sushi mine
+     * @param _cfnxToken  the mined reward token
+     * @param _sushiMineStartTime mine start time
+     * @param _sushimineInterval the sushi mine time interval
+     */
     function initSushiMine(address _cfnxToken,uint256 _sushiMineStartTime,uint256 _sushimineInterval) public onlyOwner{
         if(_cfnxToken!=address(0))
             cfnxToken = _cfnxToken;
@@ -120,12 +138,18 @@ contract AirDropVault is AirDropVaultData {
        
     }
 
-
+   /**
+   * @dev setting function.set airdrop users address and balance in whitelist ways
+   * @param _accounts   the user address.tested support 200 address in one tx
+   * @param _fnxnumbers the user's airdrop fnx number
+   */   
     function setWhiteList(address[] memory _accounts,uint256[] memory _fnxnumbers) public onlyOperator(1) {
         require(_accounts.length==_fnxnumbers.length,"the input array length is not equal");
         uint256 i = 0;
         for(;i<_accounts.length;i++) {
             if(userWhiteList[_accounts[i]]==0) {
+               require(_fnxnumbers[i]>0,"fnx number must be over 0!");
+               //just for tatics    
                totalWhiteListAirdrop = totalWhiteListAirdrop.add(_fnxnumbers[i]);
                userWhiteList[_accounts[i]] = _fnxnumbers[i];
                emit AddWhiteList(_accounts[i],_fnxnumbers[i]);
@@ -133,7 +157,9 @@ contract AirDropVault is AirDropVaultData {
         }
     }
     
-    
+    /**
+    * @dev claim the airdrop for user in whitelist ways
+    */
     function whitelistClaim() public airdropinited {
         require(now >= claimBeginTime,"claim not begin");
         require(now < claimEndTime,"claim finished");
@@ -164,24 +190,34 @@ contract AirDropVault is AirDropVaultData {
          }
     }
     
+   /**
+   * @dev setting function.set target token and required balance for airdrop token
+   * @param _tokens   the tokens address.tested support 200 address in one tx
+   * @param _minBalForFreeClaim  the required minimal balance for the claimer
+   */    
     function setTokenList(address[] memory _tokens,uint256[] memory _minBalForFreeClaim) public onlyOwner {
         uint256 i = 0;
         require(_tokens.length==_minBalForFreeClaim.length,"array length is not match");
         for (i=0;i<_tokens.length;i++) {
-            require(_minBalForFreeClaim[i]>0);
             if(tkBalanceRequire[_tokens[i]]==0) {
+                require(_minBalForFreeClaim[i]>0,"the min balance require must be over 0!");
                 tkBalanceRequire[_tokens[i]] = _minBalForFreeClaim[i];
                 tokenWhiteList.push(_tokens[i]);
             }
         }
     }
     
+   /**
+   * @dev getting function.get user claimable airdrop balance for curve.hegic user
+   * @param _targetToken the token address for getting balance from it for user 
+   * @param _account user address
+   */     
     function balanceOfFreeClaimAirDrop(address _targetToken,address _account) public view airdropinited returns(uint256){
         require(tkBalanceRequire[_targetToken]>0,"the target token is not set active");
         require(now >= claimBeginTime,"claim not begin");
         require(now < claimEndTime,"claim finished");
-        if(totalFreeClaimed < maxFreeFnxAirDrop) {
-            if(!freeClaimedUserList[_targetToken][_account]) {
+        if(!freeClaimedUserList[_targetToken][_account]) {
+            if(totalFreeClaimed < maxFreeFnxAirDrop) {
                 uint256 bal = ITargetToken(_targetToken).balanceOf(_account);
                 if(bal>=tkBalanceRequire[_targetToken]) {
                     uint256 amount = fnxPerFreeClaimUser;
@@ -197,19 +233,26 @@ contract AirDropVault is AirDropVaultData {
         return 0;
     }
 
+   /**
+   * @dev user claim airdrop for curve.hegic user
+   * @param _targetToken the token address for getting balance from it for user 
+   */ 
     function freeClaim(address _targetToken) public airdropinited {
         require(tkBalanceRequire[_targetToken]>0,"the target token is not set active");
         require(now >= claimBeginTime,"claim not begin");
         require(now < claimEndTime,"claim finished");
         
+        //the user not claimed yet
         if(!freeClaimedUserList[_targetToken][msg.sender]) {
+            //total claimed fnx not over the max free claim limit
            if(totalFreeClaimed < maxFreeFnxAirDrop) {
                 //set user claimed already
                 freeClaimedUserList[_targetToken][msg.sender] = true;
+                //get user balance in target token
                 uint256 bal = ITargetToken(_targetToken).balanceOf(msg.sender);
-                if(bal>=tkBalanceRequire[_targetToken]){
+                //over the required balance number
+                if(bal >= tkBalanceRequire[_targetToken]){
                     uint256 amount = fnxPerFreeClaimUser;
-                
  
                     uint256 total = totalFreeClaimed.add(amount);
                     if(total>maxFreeFnxAirDrop) {
@@ -232,23 +275,33 @@ contract AirDropVault is AirDropVaultData {
             }
         }
     }   
-    
-   
+
+        
+   /**
+   * @dev setting function.set user the subcidy balance for sushi fnx-eth miners
+   * @param _accounts   the user address.tested support 200 address in one tx
+   * @param _fnxnumbers the user's mined fnx number
+   */    
    function setSushiMineList(address[] memory _accounts,uint256[] memory _fnxnumbers) public onlyOperator(1) {
         require(_accounts.length==_fnxnumbers.length,"the input array length is not equal");
         uint256 i = 0;
         uint256 idx = (now - sushiMineStartTime)/sushimineInterval;
         for(;i<_accounts.length;i++) {
-            require((!sushiMineRecord[idx][_accounts[i]]),"user's mine have been set already");
-            sushiMineRecord[idx][_accounts[i]] = true;
-            
-            suhiUserMineBalance[_accounts[i]] = suhiUserMineBalance[_accounts[i]].add(_fnxnumbers[i]);
-            sushiTotalMine = sushiTotalMine.add(_fnxnumbers[i]);
-            
-            emit AddSushiList(_accounts[i],_fnxnumbers[i]);
+            if(!sushiMineRecord[idx][_accounts[i]]) {
+                require(_fnxnumbers[i] > 0, "fnx number must be over 0!");
+                
+                sushiMineRecord[idx][_accounts[i]] = true;
+                suhiUserMineBalance[_accounts[i]] = suhiUserMineBalance[_accounts[i]].add(_fnxnumbers[i]);
+                sushiTotalMine = sushiTotalMine.add(_fnxnumbers[i]);
+                
+                emit AddSushiList(_accounts[i],_fnxnumbers[i]);
+            }
         }
     }
     
+    /**
+     * @dev  user get fnx subsidy for sushi fnx-eth mine pool
+     */
     function sushiMineClaim() public suhsimineinited {
         require(suhiUserMineBalance[msg.sender]>0,"sushi mine balance is not enough");
         
@@ -263,6 +316,10 @@ contract AirDropVault is AirDropVaultData {
         emit SushiMineClaim(msg.sender,amount);
     }
     
+    /**
+     * @dev getting function.retrieve all of the balance for airdrop include whitelist and free claimer
+     * @param _account  the user 
+     */    
     function balanceOfAirDrop(address _account) public view returns(uint256){
         uint256 whitelsBal = balanceOfWhitListUser(_account);
         uint256 i = 0;
@@ -274,6 +331,9 @@ contract AirDropVault is AirDropVaultData {
         return whitelsBal.add(freeClaimBal);
     }
     
+    /**
+     * @dev claim all of the airdrop include whitelist and free claimer
+     */
     function claimAirdrop() public {
          whitelistClaim();
          uint256 i;
