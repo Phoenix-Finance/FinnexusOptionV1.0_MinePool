@@ -63,6 +63,10 @@ contract TokenConverter is TokenConverterData {
     }
 
 
+    /**
+     * @dev user input cnfx to get fnx
+     * @param amount fnx amount
+     */ 
     function inputCfnxForInstallmentPay(uint256 amount) external inited {
         require(amount>0,"amount should be bigger than 0");
         
@@ -92,7 +96,9 @@ contract TokenConverter is TokenConverterData {
         emit InputCfnx(msg.sender,amount,divAmount);
     }
     
-    
+      /**
+     * @dev user user claim expired reward
+     */ 
     function claimFnxExpiredReward() external inited {
         require(fnxAddress!=address(0),"fnx token should be set");
         
@@ -148,6 +154,10 @@ contract TokenConverter is TokenConverterData {
         emit ClaimFnx(msg.sender,totalRet,txcnt);
     }
     
+      /**
+     * @dev get user claimable balance
+     * @param _user the user address
+     */ 
     function getClaimAbleBalance(address _user) public view returns (uint256) {
         require(fnxAddress!=address(0),"fnx token should be set");
         
