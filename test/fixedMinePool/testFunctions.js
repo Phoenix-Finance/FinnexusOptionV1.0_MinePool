@@ -68,7 +68,7 @@ exports.migrateTimedMinePool =  async function (accounts){
     let CFNXB = await CFNX.new();
     let USDC = await CFNX.new();
     let Mine = await CFNX.new();
-    let startTime = 10000000;
+    let startTime = 0;
     let minePoolImpl = await fixedMinePool_Timed.new(CFNXA.address,CFNXB.address,startTime);
     let minePool = await minePoolProxy.new(minePoolImpl.address,CFNXA.address,CFNXB.address,startTime);
     await CFNXA.mint(accounts[0],1000000000000000);

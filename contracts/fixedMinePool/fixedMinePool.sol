@@ -293,7 +293,13 @@ contract fixedMinePool is fixedMinePoolData {
     function _mineSettlement(address mineCoin)internal{
         uint256 latestTime = mineInfoMap[mineCoin].latestSettleTime;
         uint256 curIndex = getPeriodIndex(latestTime);
+        if (curIndex == 0){
+            latestTime = _startTime;
+        }
         uint256 nowIndex = getPeriodIndex(currentTime());
+        if (nowIndex == 0){
+            return;
+        }
         for (uint256 i=0;i<_maxLoop;i++){
             // If the fixed distribution is zero, we only need calculate 
             uint256 finishTime = getPeriodFinishTime(curIndex);
@@ -343,12 +349,17 @@ contract fixedMinePool is fixedMinePoolData {
      */  
     function _settleUserMine(address mineCoin,address account) internal {
         uint256 nowIndex = getPeriodIndex(currentTime());
+        if (nowIndex == 0){
+            return;
+        }
         if(userInfoMap[account].distribution>0){
             uint256 userPeriod = userInfoMap[account].settlePeriod[mineCoin];
+            if(userPeriod == 0){
+                userPeriod = 1;
+            }
             if (userPeriod < mineInfoMap[mineCoin].startPeriod){
                 userPeriod = mineInfoMap[mineCoin].startPeriod;
             }
-            
             for (uint256 i = 0;i<_maxLoop;i++){
                 _settlementPeriod(mineCoin,account,userPeriod);
                 if (userPeriod >= nowIndex){
@@ -513,7 +524,7 @@ contract fixedMinePool is fixedMinePoolData {
      * @dev Stake FPT-A coin and get distribution for mining.
      * @param amount FPT-A amount that transfer into mine pool.
      */
-    function stakeFPTA(uint256 amount)public nonReentrant notHalted{
+    function stakeFPTA(uint256 amount)public minePoolStarted nonReentrant notHalted{
         amount = getPayableAmount(_FPTA,amount);
         require(amount > 0, 'stake amount is zero');
         removeDistribution(msg.sender);
@@ -526,7 +537,7 @@ contract fixedMinePool is fixedMinePoolData {
      * @param user air drop's recieptor.
      * @param ftp_b_amount FPT-B amount that transfer into mine pool.
      */
-    function lockAirDrop(address user,uint256 ftp_b_amount) external onlyOperator(1){
+    function lockAirDrop(address user,uint256 ftp_b_amount) minePoolStarted external onlyOperator(1){
         uint256 curPeriod = getPeriodIndex(currentTime());
         uint256 maxId = userInfoMap[user].maxPeriodID;
         uint256 lockedPeriod = curPeriod > maxId ? curPeriod : maxId;
@@ -543,7 +554,7 @@ contract fixedMinePool is fixedMinePoolData {
      * @param amount FPT-B amount that transfer into mine pool.
      * @param lockedPeriod locked preiod number.
      */
-    function stakeFPTB(uint256 amount,uint256 lockedPeriod)public validPeriod(lockedPeriod) nonReentrant notHalted{
+    function stakeFPTB(uint256 amount,uint256 lockedPeriod)public validPeriod(lockedPeriod) minePoolStarted nonReentrant notHalted{
         uint256 curPeriod = getPeriodIndex(currentTime());
         require(curPeriod+lockedPeriod-1>=userInfoMap[msg.sender].maxPeriodID, "lockedPeriod cannot be smaller than current locked period");
         if(userInfoMap[msg.sender].maxPeriodID<curPeriod && lockedPeriod == 1){
@@ -581,7 +592,7 @@ contract fixedMinePool is fixedMinePoolData {
      * @dev withdraw FPT-B coin.
      * @param amount FPT-B amount that withdraw from mine pool.
      */
-    function unstakeFPTB(uint256 amount)public nonReentrant notHalted periodExpired(msg.sender){
+    function unstakeFPTB(uint256 amount)public nonReentrant notHalted minePoolStarted periodExpired(msg.sender){
         require(amount > 0, 'unstake amount is zero');
         require(userInfoMap[msg.sender]._FPTBBalance >= amount,
             'unstake amount is greater than total user stakes');
@@ -595,7 +606,7 @@ contract fixedMinePool is fixedMinePoolData {
      * @dev Add FPT-B locked period.
      * @param lockedPeriod FPT-B locked preiod number.
      */
-    function changeFPTBLockedPeriod(uint256 lockedPeriod)public validPeriod(lockedPeriod) notHalted{
+    function changeFPTBLockedPeriod(uint256 lockedPeriod)public validPeriod(lockedPeriod) minePoolStarted notHalted{
         require(userInfoMap[msg.sender]._FPTBBalance > 0, "stake FPTB balance is zero");
         uint256 curPeriod = getPeriodIndex(currentTime());
         require(curPeriod+lockedPeriod-1>=userInfoMap[msg.sender].maxPeriodID, "lockedPeriod cannot be smaller than current locked period");
@@ -835,6 +846,13 @@ contract fixedMinePool is fixedMinePoolData {
      */
     modifier validPeriod(uint256 period){
         require(period >= 0 && period <= _maxPeriod, 'locked period must be in valid range');
+        _;
+    }
+    /**
+     * @dev Throws if minePool is not start.
+     */
+    modifier minePoolStarted(){
+        require(currentTime()>=_startTime, 'mine pool is not start');
         _;
     }
     /**
