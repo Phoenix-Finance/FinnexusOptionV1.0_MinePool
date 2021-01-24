@@ -18,6 +18,7 @@ contract fixedMinePool_Timed is fixedMinePool {
         _flexibleExpired = 0;
     }
     function update() public onlyOwner{
+        _startTime = 0;
         _flexibleExpired = 0;
     }
     function setTime(uint256 _time) public{
@@ -39,10 +40,13 @@ contract fixedMinePool_Timed is fixedMinePool {
         return userInfoMap[account].settlePeriod[mineCoin];
     }
     function getPeriodIndex(uint256 _time) public view returns (uint256) {
-        return _time/10+1;
+        if (_time<_startTime){
+            return 0;
+        }
+        return (_time-_startTime)/10+1;
     }
     function getPeriodFinishTime(uint256 periodID)public view returns (uint256) {
-        return periodID*10;
+        return periodID*10+_startTime;
     }
     function currentTime() internal view returns (uint256){
         return _timeAccumulation;
