@@ -294,7 +294,7 @@ contract AirDropVault is AirDropVaultData {
    * @param _accounts   the user address.tested support 200 address in one tx
    * @param _fnxnumbers the user's mined fnx number
    */    
-   function setSushiMineList(address[] memory _accounts,uint256[] memory _fnxnumbers) public onlyOperator(1) {
+   function setSushiMineList(address[] memory _accounts,uint256[] memory _fnxnumbers) public onlyOperator(2) {
         require(_accounts.length==_fnxnumbers.length,"the input array length is not equal");
         uint256 i = 0;
         uint256 idx = (now - sushiMineStartTime)/sushimineInterval;
