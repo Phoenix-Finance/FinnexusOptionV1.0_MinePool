@@ -133,6 +133,7 @@ contract TokenConverter is TokenConverterData {
                             lockedAllRewards[msg.sender][i].alloc[0] = lockedAllRewards[msg.sender][i].alloc[0].sub(subtotal);
                         } else {
                             subtotal = lockedAllRewards[msg.sender][i].alloc[0];
+                            lockedAllRewards[msg.sender][i].alloc[0] = 0;
                         }
                         
                         totalRet = totalRet.add(subtotal);
