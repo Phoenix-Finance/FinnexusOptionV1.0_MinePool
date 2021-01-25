@@ -43,7 +43,6 @@ contract AirDropVault is AirDropVaultData {
     function initialize() onlyOwner public {}
     
     function update() onlyOwner public{ 
-        //totalFreeClaimed = 0;
     }
     
     

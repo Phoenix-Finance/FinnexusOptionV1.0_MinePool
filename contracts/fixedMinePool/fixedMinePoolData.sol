@@ -151,5 +151,4 @@ contract fixedMinePoolData is initializable,Operator,Halt,AddressWhiteList,Reent
      */
     event RedeemMineCoin(address indexed account, address indexed mineCoin, uint256 value);
 
-    event DebugEvent(uint256 indexed value1,uint256 indexed value2,uint256 value3);
 }
