@@ -7,6 +7,7 @@ pragma solidity =0.5.16;
 import "../modules/SafeMath.sol";
 import "./fixedMinePoolData.sol";
 import "../ERC20/IERC20.sol";
+import "../ERC20/safeErc20.sol";
 /**
  * @title FNX period mine pool.
  * @dev A smart-contract which distribute some mine coins when user stake FPT-A and FPT-B coins.
@@ -30,6 +31,9 @@ contract fixedMinePool is fixedMinePoolData {
      * @dev default function for foundation input miner coins.
      */
     function()external payable{
+
+    }
+    function update()public onlyOwner{
 
     }
     /**
@@ -140,7 +144,8 @@ contract fixedMinePool is fixedMinePoolData {
         }else{
             IERC20 token = IERC20(mineCoin);
             uint256 preBalance = token.balanceOf(address(this));
-            token.transfer(recieptor,amount);
+            SafeERC20.safeTransfer(token,recieptor,amount);
+//            token.transfer(recieptor,amount);
             uint256 afterBalance = token.balanceOf(address(this));
             require(preBalance - afterBalance == amount,"settlement token transfer error!");
         }
@@ -632,7 +637,8 @@ contract fixedMinePool is fixedMinePoolData {
         }else if (settlementAmount > 0){
             IERC20 oToken = IERC20(settlement);
             uint256 preBalance = oToken.balanceOf(address(this));
-            oToken.transferFrom(msg.sender, address(this), settlementAmount);
+            SafeERC20.safeTransferFrom(oToken,msg.sender, address(this), settlementAmount);
+            //oToken.transferFrom(msg.sender, address(this), settlementAmount);
             uint256 afterBalance = oToken.balanceOf(address(this));
             require(afterBalance-preBalance==settlementAmount,"settlement token transfer error!");
         }
