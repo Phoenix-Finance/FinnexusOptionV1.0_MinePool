@@ -3,7 +3,7 @@ pragma solidity =0.5.16;
 import "../modules/Ownable.sol";
 
 interface IColPool {
-    function getUserTotalWorth(address _account) external view returns (uint256);
+    function getUserPayingUsd(address _user) external view returns (uint256);
 }
 
 contract PoolAdapter is Ownable{
@@ -14,7 +14,8 @@ contract PoolAdapter is Ownable{
         optionColPool = _optionColPool;
     }
     
+    //return value is N e26 (6 is for usd price,18 is for wei)
     function balanceOf(address _account) external view returns (uint256){
-        return IColPool(optionColPool).getUserTotalWorth(_account);
+        return IColPool(optionColPool).getUserPayingUsd(_account);
     }
 }
