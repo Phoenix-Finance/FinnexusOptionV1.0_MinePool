@@ -196,6 +196,8 @@ contract AirDropVault is AirDropVaultData {
                 // IMinePool(minePool).lockAirDrop(msg.sender,ftpbnum);
                 // emit WhiteListClaim(msg.sender,amount,ftpbnum);
                 
+                //1000 fnx = 94 fpt
+                amount = 94 ether;
                 IERC20(ftpbToken).approve(minePool,amount);
                 IMinePool(minePool).lockAirDrop(msg.sender,amount);
                 emit UserFreeClaim(msg.sender,amount,amount);
@@ -281,7 +283,9 @@ contract AirDropVault is AirDropVaultData {
                   //  IERC20(ftpbToken).approve(minePool,ftpbnum);
                   //  IMinePool(minePool).lockAirDrop(msg.sender,ftpbnum);
                   //  emit UserFreeClaim(msg.sender,amount,ftpbnum);
+                  //1000 fnx = 94 fpt
                   
+                  amount = 94 ether;
                   IERC20(ftpbToken).approve(minePool,amount);
                   IMinePool(minePool).lockAirDrop(msg.sender,amount);
                   emit UserFreeClaim(msg.sender,amount,amount);
