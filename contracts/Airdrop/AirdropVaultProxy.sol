@@ -72,5 +72,8 @@ contract AirDropVaultProxy is AirDropVaultData,baseProxy {
           delegateAndReturn();
     }
     
+    function resetTokenList()  public {
+          delegateAndReturn();
+    }
     
 }
