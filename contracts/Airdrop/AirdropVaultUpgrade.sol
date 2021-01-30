@@ -113,7 +113,13 @@ contract AirDropVault is AirDropVaultData {
      */
     function getbackLeftFnx(address _reciever)  public onlyOwner {
         uint256 bal =  IERC20(fnxToken).balanceOf(address(this));
-        IERC20(fnxToken).transfer(_reciever,bal);
+        if(bal>0)
+            IERC20(fnxToken).transfer(_reciever,bal);
+        
+        bal = IERC20(ftpbToken).balanceOf(address(this));
+        if(bal>0)
+            IERC20(ftpbToken).transfer(_reciever,bal);
+            
     }  
     
     /**
