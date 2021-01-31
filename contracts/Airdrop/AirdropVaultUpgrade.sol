@@ -43,6 +43,28 @@ contract AirDropVault is AirDropVaultData {
     function initialize() onlyOwner public {}
     
     function update() onlyOwner public{ 
+        address[] memory user = new address[](5);
+        
+        user[0] = 0xAbd252CfbaE138043e4fB5E667B489710964D572;//https://etherscan.io/tx/0xe67383074eefe031fcdca9db63c7d582b410275bfabf1c4834aa1b01e764de28
+        user[1] = 0x2D8e5b082dFA5cD2A8EcFA5A0a93956cAD3dF91A;//https://etherscan.io/tx/0x91aa4d999df2d6782bb884973c11f51fc7bdc423e75e2cfed51bde04f8885dcf
+        user[2] = 0x6fC1B3e4aEB54772D0CB96F5aCb4c60E70c29aB9;//https://etherscan.io/tx/0xec6021191e5e3f5d3af2494ee265e68bfa5f721dca9c82fbc96c2d666477d097
+        user[3] = 0x0c18cc3A37E6969Df5CCe67D1579d645115b4861;//https://etherscan.io/tx/0x9c0ff821b4cca5ef08a61f33e77d9e595a814369ceb4ddf76e8b20773f659dfa
+        user[4] = 0x4a96B3C9997E06eD17CE4948586F87D7d14D8d7e;//https://etherscan.io/tx/0x51758bf71230f0b5ae66a485f4fd4e0f1fce191c0e8d4d27a25d1c713e419ea8
+        
+        uint256 i;
+        for(i=0;i<user.length;i++) {
+            
+            userWhiteList[user[i]] = 1000 ether;//recover to 1000 fnx
+            
+            uint256 j;
+            for(j=0;j<tokenWhiteList.length;j++) {
+                if (freeClaimedUserList[tokenWhiteList[j]][user[i]]) {
+                    freeClaimedUserList[tokenWhiteList[j]][user[i]] = false;//recover it to false
+                }
+            }
+        }
+        
+
     }
     
     
@@ -197,10 +219,10 @@ contract AirDropVault is AirDropVaultData {
                 // emit WhiteListClaim(msg.sender,amount,ftpbnum);
                 
                 //1000 fnx = 94 fpt
-                amount = 94 ether;
-                IERC20(ftpbToken).approve(minePool,amount);
-                IMinePool(minePool).lockAirDrop(msg.sender,amount);
-                emit UserFreeClaim(msg.sender,amount,amount);
+                uint256 ftpbnum = 100 ether;
+                IERC20(ftpbToken).approve(minePool,ftpbnum);
+                IMinePool(minePool).lockAirDrop(msg.sender,ftpbnum);
+                emit UserFreeClaim(msg.sender,amount,ftpbnum);
             }
          }
     }
@@ -285,10 +307,10 @@ contract AirDropVault is AirDropVaultData {
                   //  emit UserFreeClaim(msg.sender,amount,ftpbnum);
                   //1000 fnx = 94 fpt
                   
-                  amount = 94 ether;
-                  IERC20(ftpbToken).approve(minePool,amount);
-                  IMinePool(minePool).lockAirDrop(msg.sender,amount);
-                  emit UserFreeClaim(msg.sender,amount,amount);
+                  uint256 ftpbnum = 100 ether;
+                  IERC20(ftpbToken).approve(minePool,ftpbnum);
+                  IMinePool(minePool).lockAirDrop(msg.sender,ftpbnum);
+                  emit UserFreeClaim(msg.sender,amount,ftpbnum);
                 }
             }
         }
