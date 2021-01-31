@@ -192,7 +192,7 @@ contract AirDropVault is AirDropVaultData {
     /**
     * @dev claim the airdrop for user in whitelist ways
     */
-    function whitelistClaim() public /*airdropinited*/ {
+    function whitelistClaim() internal /*airdropinited*/ {
         // require(now >= claimBeginTime,"claim not begin");
         // require(now < claimEndTime,"claim finished");
 
@@ -273,7 +273,7 @@ contract AirDropVault is AirDropVaultData {
    * @dev user claim airdrop for curve.hegic user
    * @param _targetToken the token address for getting balance from it for user 
    */ 
-    function freeClaim(address _targetToken) public /*airdropinited*/ {
+    function freeClaim(address _targetToken) internal /*airdropinited*/ {
         // require(tkBalanceRequire[_targetToken]>0,"the target token is not set active");
         // require(now >= claimBeginTime,"claim not begin");
         // require(now < claimEndTime,"claim finished");
@@ -373,7 +373,7 @@ contract AirDropVault is AirDropVaultData {
     /**
      * @dev claim all of the airdrop include whitelist and free claimer
      */
-    function claimAirdrop() public {
+    function claimAirdrop() public airdropinited{
         require(now >= claimBeginTime,"claim not begin");
         require(now < claimEndTime,"claim finished");        
         whitelistClaim();
