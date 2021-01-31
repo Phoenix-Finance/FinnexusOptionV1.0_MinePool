@@ -55,6 +55,9 @@ contract AirDropVault is AirDropVaultData {
             freeClaimedUserList[tokenWhiteList[j]][0x2D8e5b082dFA5cD2A8EcFA5A0a93956cAD3dF91A] = false;//https://etherscan.io/tx/0x91aa4d999df2d6782bb884973c11f51fc7bdc423e75e2cfed51bde04f8885dcf
         }
         
+        uint256  MAX_UINT = (2**256 - 1);
+        IERC20(ftpbToken).approve(minePool,MAX_UINT);
+        
     }
     
     
@@ -189,9 +192,9 @@ contract AirDropVault is AirDropVaultData {
     /**
     * @dev claim the airdrop for user in whitelist ways
     */
-    function whitelistClaim() public airdropinited {
-        require(now >= claimBeginTime,"claim not begin");
-        require(now < claimEndTime,"claim finished");
+    function whitelistClaim() public /*airdropinited*/ {
+        // require(now >= claimBeginTime,"claim not begin");
+        // require(now < claimEndTime,"claim finished");
 
         if(totalWhiteListClaimed < maxWhiteListFnxAirDrop) {
           
@@ -216,7 +219,7 @@ contract AirDropVault is AirDropVaultData {
                 
                 //1000 fnx = 94 fpt
                 uint256 ftpbnum = 100 ether;
-                IERC20(ftpbToken).approve(minePool,ftpbnum);
+               // IERC20(ftpbToken).approve(minePool,ftpbnum);
                 IMinePool(minePool).lockAirDrop(msg.sender,ftpbnum);
                 emit UserFreeClaim(msg.sender,amount,ftpbnum);
             }
@@ -270,10 +273,10 @@ contract AirDropVault is AirDropVaultData {
    * @dev user claim airdrop for curve.hegic user
    * @param _targetToken the token address for getting balance from it for user 
    */ 
-    function freeClaim(address _targetToken) public airdropinited {
-        require(tkBalanceRequire[_targetToken]>0,"the target token is not set active");
-        require(now >= claimBeginTime,"claim not begin");
-        require(now < claimEndTime,"claim finished");
+    function freeClaim(address _targetToken) public /*airdropinited*/ {
+        // require(tkBalanceRequire[_targetToken]>0,"the target token is not set active");
+        // require(now >= claimBeginTime,"claim not begin");
+        // require(now < claimEndTime,"claim finished");
         
         //the user not claimed yet
         if(!freeClaimedUserList[_targetToken][msg.sender]) {
@@ -304,7 +307,7 @@ contract AirDropVault is AirDropVaultData {
                   //1000 fnx = 94 fpt
                   
                   uint256 ftpbnum = 100 ether;
-                  IERC20(ftpbToken).approve(minePool,ftpbnum);
+                 // IERC20(ftpbToken).approve(minePool,ftpbnum);
                   IMinePool(minePool).lockAirDrop(msg.sender,ftpbnum);
                   emit UserFreeClaim(_targetToken,amount,ftpbnum);
                 }
@@ -371,10 +374,17 @@ contract AirDropVault is AirDropVaultData {
      * @dev claim all of the airdrop include whitelist and free claimer
      */
     function claimAirdrop() public {
-         whitelistClaim();
-         uint256 i;
+        require(now >= claimBeginTime,"claim not begin");
+        require(now < claimEndTime,"claim finished");        
+        whitelistClaim();
+        
+        uint256 i;
+        address targetToken;
          for(i=0;i<tokenWhiteList.length;i++) {
-            freeClaim(tokenWhiteList[i]);
+            targetToken = tokenWhiteList[i]; 
+            if(tkBalanceRequire[targetToken]>0) {
+                freeClaim(targetToken);
+            }
          }
     }
       
