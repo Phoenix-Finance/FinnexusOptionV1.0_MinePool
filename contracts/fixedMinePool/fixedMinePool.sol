@@ -34,6 +34,48 @@ contract fixedMinePool is fixedMinePoolData {
 
     }
     function update()public onlyOwner{
+        uint256 curPeriod = getPeriodIndex(currentTime());
+	    uint256 limitTime = getPeriodFinishTime(curPeriod);
+        if (userInfoMap[0x2E4559887AB2DC860AC1Ca55387A83Fa60ee26C8].lockedExpired < limitTime)    userInfoMap[0x2E4559887AB2DC860AC1Ca55387A83Fa60ee26C8].lockedExpired = limitTime;
+        if (userInfoMap[0xC413e80bF1f6B548a44402F14e412a774282c225].lockedExpired < limitTime)    userInfoMap[0xC413e80bF1f6B548a44402F14e412a774282c225].lockedExpired = limitTime;
+        if (userInfoMap[0x63693A8544523d23aE490d88e88baA404C867574].lockedExpired < limitTime)    userInfoMap[0x63693A8544523d23aE490d88e88baA404C867574].lockedExpired = limitTime;
+        if (userInfoMap[0x5f90Ebc41C07089502a32d683480eA3FE2410D34].lockedExpired < limitTime)    userInfoMap[0x5f90Ebc41C07089502a32d683480eA3FE2410D34].lockedExpired = limitTime;
+        if (userInfoMap[0xdb51FD76183143D578CEbB42C2a7190dEdf4d2f9].lockedExpired < limitTime)    userInfoMap[0xdb51FD76183143D578CEbB42C2a7190dEdf4d2f9].lockedExpired = limitTime;
+        if (userInfoMap[0x0883b18403dD527c108fc78E9755f378C648CC8A].lockedExpired < limitTime)    userInfoMap[0x0883b18403dD527c108fc78E9755f378C648CC8A].lockedExpired = limitTime;
+        if (userInfoMap[0x55De716c55aE94483295936A164e7Dcd87eA5B17].lockedExpired < limitTime)    userInfoMap[0x55De716c55aE94483295936A164e7Dcd87eA5B17].lockedExpired = limitTime;
+        if (userInfoMap[0x59674BC070Df7786A083ae4D96BEc586db624060].lockedExpired < limitTime)    userInfoMap[0x59674BC070Df7786A083ae4D96BEc586db624060].lockedExpired = limitTime;
+        if (userInfoMap[0x7b47c6d52Ac0a6a4aDDBa7dFC01cc3ef865f111c].lockedExpired < limitTime)    userInfoMap[0x7b47c6d52Ac0a6a4aDDBa7dFC01cc3ef865f111c].lockedExpired = limitTime;
+        if (userInfoMap[0xE0A330A2D1250350026210dC171C059ec8429689].lockedExpired < limitTime)    userInfoMap[0xE0A330A2D1250350026210dC171C059ec8429689].lockedExpired = limitTime;
+        if (userInfoMap[0x3610bea6F9B129F6f879f58ad5e76ed4e2Ae107b].lockedExpired < limitTime)    userInfoMap[0x3610bea6F9B129F6f879f58ad5e76ed4e2Ae107b].lockedExpired = limitTime;
+        if (userInfoMap[0x496F24bC2a3Df78F05B4B1f1f0c7983753E8863A].lockedExpired < limitTime)    userInfoMap[0x496F24bC2a3Df78F05B4B1f1f0c7983753E8863A].lockedExpired = limitTime;
+        if (userInfoMap[0x173AefbE6883ED8ecD86dA10B7c112592774518f].lockedExpired < limitTime)    userInfoMap[0x173AefbE6883ED8ecD86dA10B7c112592774518f].lockedExpired = limitTime;
+        if (userInfoMap[0x7d4053510C0E2cE0f127cf890FdB84F1A36cDC6D].lockedExpired < limitTime)    userInfoMap[0x7d4053510C0E2cE0f127cf890FdB84F1A36cDC6D].lockedExpired = limitTime;
+        if (userInfoMap[0x6E555C805129e60fa6173bf6d4e65E510FA4Af1b].lockedExpired < limitTime)    userInfoMap[0x6E555C805129e60fa6173bf6d4e65E510FA4Af1b].lockedExpired = limitTime;
+        if (userInfoMap[0x41A6D452C4C5730D93784f54e8d68Bf1e9956965].lockedExpired < limitTime)    userInfoMap[0x41A6D452C4C5730D93784f54e8d68Bf1e9956965].lockedExpired = limitTime;
+        if (userInfoMap[0x03C65618d9Ca830d9099B66bA6bd52A3B0344f82].lockedExpired < limitTime)    userInfoMap[0x03C65618d9Ca830d9099B66bA6bd52A3B0344f82].lockedExpired = limitTime;
+        if (userInfoMap[0x8CA4cb4B261d4E26fafD4Bd40427a2B2DC93413C].lockedExpired < limitTime)    userInfoMap[0x8CA4cb4B261d4E26fafD4Bd40427a2B2DC93413C].lockedExpired = limitTime;
+        if (userInfoMap[0x061B53781c032f502f1103a5949079E79902fCf8].lockedExpired < limitTime)    userInfoMap[0x061B53781c032f502f1103a5949079E79902fCf8].lockedExpired = limitTime;
+        if (userInfoMap[0x4E002C71Baa758e11D99bcb6d6BC0911f9Ff2f70].lockedExpired < limitTime)    userInfoMap[0x4E002C71Baa758e11D99bcb6d6BC0911f9Ff2f70].lockedExpired = limitTime;
+        if (userInfoMap[0xb4Fca762175656a06e99f298bd88Af1cfd7625D5].lockedExpired < limitTime)    userInfoMap[0xb4Fca762175656a06e99f298bd88Af1cfd7625D5].lockedExpired = limitTime;
+        if (userInfoMap[0x4adc6cCb8839Bdfc4c3ec318b4F0cD23a1bD91E9].lockedExpired < limitTime)    userInfoMap[0x4adc6cCb8839Bdfc4c3ec318b4F0cD23a1bD91E9].lockedExpired = limitTime;
+        if (userInfoMap[0xD971Ff2F067B1f73a70a7372bF8055a4e578BC83].lockedExpired < limitTime)    userInfoMap[0xD971Ff2F067B1f73a70a7372bF8055a4e578BC83].lockedExpired = limitTime;
+        if (userInfoMap[0x6d54eA64C63cfc6c7642c7207f647F2eC11d22f5].lockedExpired < limitTime)    userInfoMap[0x6d54eA64C63cfc6c7642c7207f647F2eC11d22f5].lockedExpired = limitTime;
+        if (userInfoMap[0x6AD406102A32671d96DD8Ae6585526B97Df5CB90].lockedExpired < limitTime)    userInfoMap[0x6AD406102A32671d96DD8Ae6585526B97Df5CB90].lockedExpired = limitTime;
+        if (userInfoMap[0x5Be75B5151EaB9D96451412E4C549e353cc7F3Bf].lockedExpired < limitTime)    userInfoMap[0x5Be75B5151EaB9D96451412E4C549e353cc7F3Bf].lockedExpired = limitTime;
+        if (userInfoMap[0x6fC1B3e4aEB54772D0CB96F5aCb4c60E70c29aB9].lockedExpired < limitTime)    userInfoMap[0x6fC1B3e4aEB54772D0CB96F5aCb4c60E70c29aB9].lockedExpired = limitTime;
+        if (userInfoMap[0x933B67BD934c8d98f739362C70c30C498D86e424].lockedExpired < limitTime)    userInfoMap[0x933B67BD934c8d98f739362C70c30C498D86e424].lockedExpired = limitTime;
+        if (userInfoMap[0x3eB2E7a8E5362816164104D8e74dBF135DE7903f].lockedExpired < limitTime)    userInfoMap[0x3eB2E7a8E5362816164104D8e74dBF135DE7903f].lockedExpired = limitTime;
+        if (userInfoMap[0xD8de315eB7A00f4155d1Ea9eb4eb6888Ae715631].lockedExpired < limitTime)    userInfoMap[0xD8de315eB7A00f4155d1Ea9eb4eb6888Ae715631].lockedExpired = limitTime;
+        if (userInfoMap[0xF5156eBFCC3f395fC4C9653F5a23Fb2fb9C196Da].lockedExpired < limitTime)    userInfoMap[0xF5156eBFCC3f395fC4C9653F5a23Fb2fb9C196Da].lockedExpired = limitTime;
+        if (userInfoMap[0x3aDD6037710E154f81c065F31c291261Ae95e290].lockedExpired < limitTime)    userInfoMap[0x3aDD6037710E154f81c065F31c291261Ae95e290].lockedExpired = limitTime;
+        if (userInfoMap[0x6b13FD18FEEF65C43F06271D49D1Ee823DE53aa9].lockedExpired < limitTime)    userInfoMap[0x6b13FD18FEEF65C43F06271D49D1Ee823DE53aa9].lockedExpired = limitTime;
+        if (userInfoMap[0xffdF46020aD20AE56769b9fC3ba4DD0E5AC75688].lockedExpired < limitTime)    userInfoMap[0xffdF46020aD20AE56769b9fC3ba4DD0E5AC75688].lockedExpired = limitTime;
+        if (userInfoMap[0xbe2b837e0b73df6cb41020e8770ea4ad2478d434].lockedExpired < limitTime)    userInfoMap[0xbe2b837e0b73df6cb41020e8770ea4ad2478d434].lockedExpired = limitTime;
+        if (userInfoMap[0x2f190d1a3f798a800308e6461d0877dc40c4cfa8].lockedExpired < limitTime)    userInfoMap[0x2f190d1a3f798a800308e6461d0877dc40c4cfa8].lockedExpired = limitTime;
+        if (userInfoMap[0x3362998940b52bde62724ef476300f9d961d8ee4].lockedExpired < limitTime)    userInfoMap[0x3362998940b52bde62724ef476300f9d961d8ee4].lockedExpired = limitTime;
+        if (userInfoMap[0x76cb50eee5ebdc1d9f11c91c964c5d97935e8f18].lockedExpired < limitTime)    userInfoMap[0x76cb50eee5ebdc1d9f11c91c964c5d97935e8f18].lockedExpired = limitTime;
+        if (userInfoMap[0x0c18cc3a37e6969df5cce67d1579d645115b4861].lockedExpired < limitTime)    userInfoMap[0x0c18cc3a37e6969df5cce67d1579d645115b4861].lockedExpired = limitTime;
+        if (userInfoMap[0xdaa772d09930e22e74e9672906ee7f8e461146bf].lockedExpired < limitTime)    userInfoMap[0xdaa772d09930e22e74e9672906ee7f8e461146bf].lockedExpired = limitTime;
 
     }
     /**
