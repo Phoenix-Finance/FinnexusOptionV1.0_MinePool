@@ -43,11 +43,13 @@ contract AirDropVault is AirDropVaultData {
     function initialize() onlyOwner public {}
     
     function update() onlyOwner public{ 
+
         
         userWhiteList[0x6fC1B3e4aEB54772D0CB96F5aCb4c60E70c29aB9] = 1000 ether;//https://etherscan.io/tx/0xec6021191e5e3f5d3af2494ee265e68bfa5f721dca9c82fbc96c2d666477d097
         userWhiteList[0x0c18cc3A37E6969Df5CCe67D1579d645115b4861] = 1000 ether;//https://etherscan.io/tx/0x9c0ff821b4cca5ef08a61f33e77d9e595a814369ceb4ddf76e8b20773f659dfa
         userWhiteList[0x4a96B3C9997E06eD17CE4948586F87D7d14D8d7e] = 1000 ether;//https://etherscan.io/tx/0x51758bf71230f0b5ae66a485f4fd4e0f1fce191c0e8d4d27a25d1c713e419ea8
         
+
         uint256 j;
         //recover it to false
         for(j=0;j<tokenWhiteList.length;j++) {
@@ -134,6 +136,10 @@ contract AirDropVault is AirDropVaultData {
         bal = IERC20(ftpbToken).balanceOf(address(this));
         if(bal>0)
             IERC20(ftpbToken).transfer(_reciever,bal);
+
+        bal = IERC20(cfnxToken).balanceOf(address(this));
+        if(bal>0)
+            IERC20(cfnxToken).transfer(_reciever,bal);            
             
     }  
     
@@ -282,14 +288,15 @@ contract AirDropVault is AirDropVaultData {
         if(!freeClaimedUserList[_targetToken][msg.sender]) {
             //total claimed fnx not over the max free claim limit
            if(totalFreeClaimed < maxFreeFnxAirDrop) {
-                //set user claimed already
-                freeClaimedUserList[_targetToken][msg.sender] = true;
                 //get user balance in target token
                 uint256 bal = ITargetToken(_targetToken).balanceOf(msg.sender);
                 //over the required balance number
                 if(bal >= tkBalanceRequire[_targetToken]){
-                    uint256 amount = fnxPerFreeClaimUser;
- 
+                    
+                    //set user claimed already
+                    freeClaimedUserList[_targetToken][msg.sender] = true;
+
+                    uint256 amount = fnxPerFreeClaimUser; 
                     uint256 total = totalFreeClaimed.add(amount);
                     if(total>maxFreeFnxAirDrop) {
                         amount = maxFreeFnxAirDrop.sub(totalFreeClaimed);
