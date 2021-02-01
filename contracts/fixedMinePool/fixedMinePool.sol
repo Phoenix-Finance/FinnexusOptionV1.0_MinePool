@@ -551,6 +551,7 @@ contract fixedMinePool is fixedMinePoolData {
         removeDistribution(user);
         userInfoMap[user]._FPTBBalance = userInfoMap[user]._FPTBBalance.add(ftp_b_amount);
         userInfoMap[user].maxPeriodID = lockedPeriod;
+        userInfoMap[msg.sender].lockedExpired = getPeriodFinishTime(lockedPeriod);
         addDistribution(user);
         emit LockAirDrop(msg.sender,user,ftp_b_amount);
     }
