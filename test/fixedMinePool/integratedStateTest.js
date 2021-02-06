@@ -289,6 +289,25 @@ contract('integratedState', function (accounts){
             await testStateContract(contracts,inputs,checkOut)
         })
     })
+    it('integratedState state USDC,USDT and FNX ,add locked, unstaked', async function () {
+        let contracts = await deployMinePool();
+        let curPeriod = await contracts[0].getCurrentPeriodID();
+        let expiraiton = await contracts[0].getPeriodFinishTime(curPeriod.toNumber()+4)
+        let inputs = {
+            usdAddr : [USDC.address,USDT.address],
+            amountA : [10000000000,20000000000],
+            fnxAddr : [FNX.address],
+            amountB : [new BN("100000000000000000000000")],
+            lockedPeriod : 5,
+        }
+        let checkOut =["30000000000000000000000","28000000000000000000000",curPeriod.toNumber()+4,expiraiton.toNumber()]
+        await testStateContract(contracts,inputs,checkOut)
+        expiraiton = await contracts[0].getPeriodFinishTime(curPeriod.toNumber()+11)
+        inputs.lockedPeriod = 12
+        checkOut =["60000000000000000000000","56000000000000000000000",curPeriod.toNumber()+11,expiraiton.toNumber()]
+        await testStateContract(contracts,inputs,checkOut)
+        await contracts[0].unstakeFPTA(new BN("60000000000000000000000"));
+    })
     async function testStateContract (contracts,inputs,checkOut) {
         for (var i=0;i<inputs.usdAddr.length;i++){
             erc20 = await IERC20.at(inputs.usdAddr[i]);
