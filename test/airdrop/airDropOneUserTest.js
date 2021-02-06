@@ -125,6 +125,8 @@ contract('TokenConverter', function (accounts) {
             let beforeFptbMinepool = await fptbInst.balanceOf(minepoolInst.address);
 
             let tx = await airdropproxyInst.whitelistClaim({from:accounts[i]});
+            console.log(tx)
+            return;
             assert.equal(tx.receipt.status,true);
 
             let afterFnxAirdropproxy = await fnxInst.balanceOf(airdropproxyInst.address);
@@ -143,7 +145,7 @@ contract('TokenConverter', function (accounts) {
             assert.equal(diff,fnxPerPerson.toNumber());
           }
     })
-
+    return
     it('10 users claim adirdrop in free claim ways', async function () {
         let i =0;
         for(;i<userCount;i++) {
