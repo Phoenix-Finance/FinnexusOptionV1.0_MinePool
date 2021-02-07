@@ -15,6 +15,7 @@ interface IMinePool {
 }
 
 contract integratedStake is Ownable{
+    using SafeERC20 for IERC20;
     address public _FPTA;
     address public _FPTB;
     address public _FPTAColPool;//the option manager address
@@ -36,10 +37,10 @@ contract integratedStake is Ownable{
         _FPTBColPool = FPTBColPool;
         _minePool = minePool;
         if (IERC20(_FPTA).allowance(msg.sender, _minePool) == 0){
-            IERC20(_FPTA).approve(_minePool,MAX_UINT);
+            IERC20(_FPTA).safeApprove(_minePool,MAX_UINT);
         }
         if (IERC20(_FPTB).allowance(msg.sender, _minePool) == 0){
-            IERC20(_FPTB).approve(_minePool,MAX_UINT);
+            IERC20(_FPTB).safeApprove(_minePool,MAX_UINT);
         }
     }
     function stake(address[] memory fpta_tokens,uint256[] memory fpta_amounts,
@@ -48,7 +49,7 @@ contract integratedStake is Ownable{
         uint256 i = 0;
         for(i = 0;i<fpta_tokens.length;i++) {
             if (!approveMapA[fpta_tokens[i]]){
-                IERC20(fpta_tokens[i]).approve(_FPTAColPool,MAX_UINT);
+                IERC20(fpta_tokens[i]).safeApprove(_FPTAColPool,MAX_UINT);
                 approveMapA[fpta_tokens[i]] = true;
             }
             uint256 amount = getPayableAmount(fpta_tokens[i],fpta_amounts[i]);
@@ -56,7 +57,7 @@ contract integratedStake is Ownable{
         }
         for(i = 0;i<fptb_tokens.length;i++) {
             if (!approveMapB[fptb_tokens[i]]){
-                IERC20(fptb_tokens[i]).approve(_FPTBColPool,MAX_UINT);
+                IERC20(fptb_tokens[i]).safeApprove(_FPTBColPool,MAX_UINT);
                 approveMapB[fptb_tokens[i]] = true;
             }
             uint256 amount = getPayableAmount(fptb_tokens[i],fptb_amounts[i]);
@@ -75,7 +76,7 @@ contract integratedStake is Ownable{
         }else if (settlementAmount > 0){
             IERC20 oToken = IERC20(settlement);
             uint256 preBalance = oToken.balanceOf(address(this));
-            SafeERC20.safeTransferFrom(oToken,msg.sender, address(this), settlementAmount);
+            oToken.safeTransferFrom(msg.sender, address(this), settlementAmount);
             //oToken.transferFrom(msg.sender, address(this), settlementAmount);
             uint256 afterBalance = oToken.balanceOf(address(this));
             require(afterBalance-preBalance==settlementAmount,"settlement token transfer error!");
