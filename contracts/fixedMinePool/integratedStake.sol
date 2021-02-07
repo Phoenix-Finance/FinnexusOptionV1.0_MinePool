@@ -14,7 +14,7 @@ interface IMinePool {
     function lockAirDrop(address user,uint256 ftp_b_amount) external;
 }
 
-contract integratedState is Ownable{
+contract integratedStake is Ownable{
     address public _FPTA;
     address public _FPTB;
     address public _FPTAColPool;//the option manager address
@@ -42,7 +42,7 @@ contract integratedState is Ownable{
             IERC20(_FPTB).approve(_minePool,MAX_UINT);
         }
     }
-    function state(address[] memory fpta_tokens,uint256[] memory fpta_amounts,
+    function stake(address[] memory fpta_tokens,uint256[] memory fpta_amounts,
             address[] memory fptb_tokens,uint256[] memory fptb_amounts,uint256 lockedPeriod) public{
         require(fpta_tokens.length==fpta_amounts.length && fptb_tokens.length==fptb_amounts.length,"the input array length is not equal");
         uint256 i = 0;

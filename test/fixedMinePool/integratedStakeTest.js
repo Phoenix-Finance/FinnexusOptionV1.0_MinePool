@@ -19,13 +19,13 @@ USDT :  0x2F6902054B0ba3AC54611b3Daf7Ec500dEeEE9cf
 const IOptionMgrPoxy = artifacts.require("IOptionMgrPoxy");
 const fixedMinePool = artifacts.require("fixedMinePool");
 const minePoolProxy = artifacts.require("fixedMinePoolProxy");
-const integratedState = artifacts.require("integratedState");
+const integratedStake = artifacts.require("integratedStake");
 const CFNX = artifacts.require("CFNX");
 const { assertion } = require("@openzeppelin/test-helpers/src/expectRevert");
 const BN = require("bn.js");
 let IERC20 = artifacts.require("IERC20");
 let PeriodTime = 90*86400;
-contract('integratedState', function (accounts){
+contract('integratedStake', function (accounts){
     let FPTA;
     let FPTB;
     let managerA;
@@ -46,7 +46,7 @@ contract('integratedState', function (accounts){
         cFNX = await CFNX.new();
         console.log("cfnx address:" + cFNX.address);
     });
-    it('integratedState state only USDC', async function () {
+    it('integratedStake stake only USDC', async function () {
         let contracts = await deployMinePool();
         let curPeriod = await contracts[0].getCurrentPeriodID();
         let inputs = {
@@ -57,9 +57,9 @@ contract('integratedState', function (accounts){
             lockedPeriod : 0,
         }
         let checkOut =["10000000000000000000000","0",0,0]
-        await testStateContract(contracts,inputs,checkOut)
+        await testStakeContract(contracts,inputs,checkOut)
     })
-    it('integratedState state only USDC and Locked', async function () {
+    it('integratedStake stake only USDC and Locked', async function () {
         let contracts = await deployMinePool();
         let curPeriod = await contracts[0].getCurrentPeriodID();
         let inputs = {
@@ -70,9 +70,9 @@ contract('integratedState', function (accounts){
             lockedPeriod : 12,
         }
         let checkOut =["10000000000000000000000","0",0,0]
-        await testStateContract(contracts,inputs,checkOut)
+        await testStakeContract(contracts,inputs,checkOut)
     })
-    it('integratedState state only FNX', async function () {
+    it('integratedStake stake only FNX', async function () {
         let contracts = await deployMinePool();
         let curPeriod = await contracts[0].getCurrentPeriodID();
         let inputs = {
@@ -83,9 +83,9 @@ contract('integratedState', function (accounts){
             lockedPeriod : 0,
         }
         let checkOut =["0","28000000000000000000000",0]
-        await testStateContract(contracts,inputs,checkOut)
+        await testStakeContract(contracts,inputs,checkOut)
     })
-    it('integratedState state only FNX and locked', async function () {
+    it('integratedStake stake only FNX and locked', async function () {
         let contracts = await deployMinePool();
         let curPeriod = await contracts[0].getCurrentPeriodID();
         let locked = 5;
@@ -98,9 +98,9 @@ contract('integratedState', function (accounts){
             lockedPeriod : locked,
         }
         let checkOut =["0","28000000000000000000000",curPeriod.toNumber()+locked-1,expiraiton]
-        await testStateContract(contracts,inputs,checkOut)
+        await testStakeContract(contracts,inputs,checkOut)
     })
-    it('integratedState state USDC and FNX', async function () {
+    it('integratedStake stake USDC and FNX', async function () {
         let contracts = await deployMinePool();
         let curPeriod = await contracts[0].getCurrentPeriodID();
         let inputs = {
@@ -111,9 +111,9 @@ contract('integratedState', function (accounts){
             lockedPeriod : 0,
         }
         let checkOut =["10000000000000000000000","28000000000000000000000",0]
-        await testStateContract(contracts,inputs,checkOut)
+        await testStakeContract(contracts,inputs,checkOut)
     })
-    it('integratedState state USDC and FNX ,locked', async function () {
+    it('integratedStake stake USDC and FNX ,locked', async function () {
         let contracts = await deployMinePool();
         let curPeriod = await contracts[0].getCurrentPeriodID();
         let expiraiton = await contracts[0].getPeriodFinishTime(curPeriod.toNumber()+11)
@@ -125,9 +125,9 @@ contract('integratedState', function (accounts){
             lockedPeriod : 12,
         }
         let checkOut =["10000000000000000000000","28000000000000000000000",curPeriod.toNumber()+11,expiraiton.toNumber()]
-        await testStateContract(contracts,inputs,checkOut)
+        await testStakeContract(contracts,inputs,checkOut)
     })
-    it('integratedState state USDC,USDT and FNX ,locked', async function () {
+    it('integratedStake stake USDC,USDT and FNX ,locked', async function () {
         let contracts = await deployMinePool();
         let curPeriod = await contracts[0].getCurrentPeriodID();
         let expiraiton = await contracts[0].getPeriodFinishTime(curPeriod.toNumber()+11)
@@ -139,9 +139,9 @@ contract('integratedState', function (accounts){
             lockedPeriod : 12,
         }
         let checkOut =["30000000000000000000000","28000000000000000000000",curPeriod.toNumber()+11,expiraiton.toNumber()]
-        await testStateContract(contracts,inputs,checkOut)
+        await testStakeContract(contracts,inputs,checkOut)
     })
-    it('integratedState state only FNX twice', async function () {
+    it('integratedStake stake only FNX twice', async function () {
         let contracts = await deployMinePool();
         let curPeriod = await contracts[0].getCurrentPeriodID();
         let inputs = {
@@ -152,12 +152,12 @@ contract('integratedState', function (accounts){
             lockedPeriod : 0,
         }
         let checkOut =["0","28000000000000000000000",0]
-        await testStateContract(contracts,inputs,checkOut)
+        await testStakeContract(contracts,inputs,checkOut)
         checkOut =["0","56000000000000000000000",0]
-        await testStateContract(contracts,inputs,checkOut)
+        await testStakeContract(contracts,inputs,checkOut)
     })
     
-    it('integratedState state USDC then FNX', async function () {
+    it('integratedStake stake USDC then FNX', async function () {
         let contracts = await deployMinePool();
         let curPeriod = await contracts[0].getCurrentPeriodID();
         let inputs = {
@@ -168,7 +168,7 @@ contract('integratedState', function (accounts){
             lockedPeriod : 0,
         }
         let checkOut =["10000000000000000000000","0",0,0]
-        await testStateContract(contracts,inputs,checkOut)
+        await testStakeContract(contracts,inputs,checkOut)
         inputs = {
             usdAddr : [],
             amountA : [],
@@ -177,9 +177,9 @@ contract('integratedState', function (accounts){
             lockedPeriod : 0,
         }
         checkOut =["10000000000000000000000","28000000000000000000000",0]
-        await testStateContract(contracts,inputs,checkOut)
+        await testStakeContract(contracts,inputs,checkOut)
     })
-    it('integratedState state USDC then FNX，locked', async function () {
+    it('integratedStake stake USDC then FNX，locked', async function () {
         let contracts = await deployMinePool();
         let curPeriod = await contracts[0].getCurrentPeriodID();
         let expiraiton = await contracts[0].getPeriodFinishTime(curPeriod.toNumber()+11)
@@ -191,7 +191,7 @@ contract('integratedState', function (accounts){
             lockedPeriod : 0,
         }
         let checkOut =["10000000000000000000000","0",0,0]
-        await testStateContract(contracts,inputs,checkOut)
+        await testStakeContract(contracts,inputs,checkOut)
         inputs = {
             usdAddr : [],
             amountA : [],
@@ -200,9 +200,9 @@ contract('integratedState', function (accounts){
             lockedPeriod : 12,
         }
         checkOut =["10000000000000000000000","28000000000000000000000",curPeriod.toNumber()+11,expiraiton.toNumber()]
-        await testStateContract(contracts,inputs,checkOut)
+        await testStakeContract(contracts,inputs,checkOut)
     })
-    it('integratedState state FNX then USDC', async function () {
+    it('integratedStake stake FNX then USDC', async function () {
         let contracts = await deployMinePool();
         let curPeriod = await contracts[0].getCurrentPeriodID();
         let inputs = {
@@ -213,7 +213,7 @@ contract('integratedState', function (accounts){
             lockedPeriod : 0,
         }
         let checkOut =["0","28000000000000000000000",0]
-        await testStateContract(contracts,inputs,checkOut)
+        await testStakeContract(contracts,inputs,checkOut)
         inputs = {
 
             usdAddr : [USDC.address],
@@ -223,9 +223,9 @@ contract('integratedState', function (accounts){
             lockedPeriod : 0,
         }
         checkOut =["10000000000000000000000","28000000000000000000000",0]
-        await testStateContract(contracts,inputs,checkOut)
+        await testStakeContract(contracts,inputs,checkOut)
     })
-    it('integratedState state FNX then USDC,locked', async function () {
+    it('integratedStake stake FNX then USDC,locked', async function () {
         let contracts = await deployMinePool();
         let curPeriod = await contracts[0].getCurrentPeriodID();
         let expiraiton = await contracts[0].getPeriodFinishTime(curPeriod.toNumber()+11)
@@ -237,7 +237,7 @@ contract('integratedState', function (accounts){
             lockedPeriod : 0,
         }
         let checkOut =["0","28000000000000000000000",0]
-        await testStateContract(contracts,inputs,checkOut)
+        await testStakeContract(contracts,inputs,checkOut)
         inputs = {
 
             usdAddr : [USDC.address],
@@ -247,9 +247,9 @@ contract('integratedState', function (accounts){
             lockedPeriod : 12,
         }
         checkOut =["10000000000000000000000","28000000000000000000000",curPeriod.toNumber()+11,expiraiton.toNumber()]
-        await testStateContract(contracts,inputs,checkOut)
+        await testStakeContract(contracts,inputs,checkOut)
     })
-    it('integratedState state USDC,USDT and FNX ,add locked', async function () {
+    it('integratedStake stake USDC,USDT and FNX ,add locked', async function () {
         let contracts = await deployMinePool();
         let curPeriod = await contracts[0].getCurrentPeriodID();
         let expiraiton = await contracts[0].getPeriodFinishTime(curPeriod.toNumber()+4)
@@ -261,13 +261,13 @@ contract('integratedState', function (accounts){
             lockedPeriod : 5,
         }
         let checkOut =["30000000000000000000000","28000000000000000000000",curPeriod.toNumber()+4,expiraiton.toNumber()]
-        await testStateContract(contracts,inputs,checkOut)
+        await testStakeContract(contracts,inputs,checkOut)
         expiraiton = await contracts[0].getPeriodFinishTime(curPeriod.toNumber()+11)
         inputs.lockedPeriod = 12
         checkOut =["60000000000000000000000","56000000000000000000000",curPeriod.toNumber()+11,expiraiton.toNumber()]
-        await testStateContract(contracts,inputs,checkOut)
+        await testStakeContract(contracts,inputs,checkOut)
     })
-    it('integratedState state USDC,USDT and FNX ,less locked', async function () {
+    it('integratedStake stake USDC,USDT and FNX ,less locked', async function () {
         let contracts = await deployMinePool();
         let curPeriod = await contracts[0].getCurrentPeriodID();
         let expiraiton = await contracts[0].getPeriodFinishTime(curPeriod.toNumber()+11)
@@ -279,17 +279,17 @@ contract('integratedState', function (accounts){
             lockedPeriod : 12,
         }
         let checkOut =["30000000000000000000000","28000000000000000000000",curPeriod.toNumber()+11,expiraiton.toNumber()]
-        await testStateContract(contracts,inputs,checkOut)
+        await testStakeContract(contracts,inputs,checkOut)
         inputs.lockedPeriod = 5
         await testViolation("changing FPTB locked period input less period",async function(){
-            await testStateContract(contracts,inputs,checkOut)
+            await testStakeContract(contracts,inputs,checkOut)
         })
         inputs.lockedPeriod = 15
         await testViolation("changing FPTB locked period input error period",async function(){
-            await testStateContract(contracts,inputs,checkOut)
+            await testStakeContract(contracts,inputs,checkOut)
         })
     })
-    it('integratedState state USDC,USDT and FNX ,add locked, unstaked', async function () {
+    it('integratedStake stake USDC,USDT and FNX ,add locked, unstaked', async function () {
         let contracts = await deployMinePool();
         let curPeriod = await contracts[0].getCurrentPeriodID();
         let expiraiton = await contracts[0].getPeriodFinishTime(curPeriod.toNumber()+4)
@@ -301,14 +301,14 @@ contract('integratedState', function (accounts){
             lockedPeriod : 5,
         }
         let checkOut =["30000000000000000000000","28000000000000000000000",curPeriod.toNumber()+4,expiraiton.toNumber()]
-        await testStateContract(contracts,inputs,checkOut)
+        await testStakeContract(contracts,inputs,checkOut)
         expiraiton = await contracts[0].getPeriodFinishTime(curPeriod.toNumber()+11)
         inputs.lockedPeriod = 12
         checkOut =["60000000000000000000000","56000000000000000000000",curPeriod.toNumber()+11,expiraiton.toNumber()]
-        await testStateContract(contracts,inputs,checkOut)
+        await testStakeContract(contracts,inputs,checkOut)
         await contracts[0].unstakeFPTA(new BN("60000000000000000000000"));
     })
-    async function testStateContract (contracts,inputs,checkOut) {
+    async function testStakeContract (contracts,inputs,checkOut) {
         for (var i=0;i<inputs.usdAddr.length;i++){
             erc20 = await IERC20.at(inputs.usdAddr[i]);
             await erc20.approve(contracts[1].address,inputs.amountA[i])
@@ -317,7 +317,7 @@ contract('integratedState', function (accounts){
             erc20 = await IERC20.at(inputs.fnxAddr[i]);
             await erc20.approve(contracts[1].address,inputs.amountB[i])
         }
-        await contracts[1].state(inputs.usdAddr,inputs.amountA,inputs.fnxAddr,inputs.amountB,inputs.lockedPeriod);
+        await contracts[1].stake(inputs.usdAddr,inputs.amountA,inputs.fnxAddr,inputs.amountB,inputs.lockedPeriod);
 
         let balanceA = await contracts[0].getUserFPTABalance(accounts[0]);
         assert.equal(balanceA.toString(),checkOut[0],"User balanceA error")
@@ -337,9 +337,9 @@ contract('integratedState', function (accounts){
         let startTime = 10000000;
         let minePoolImpl = await fixedMinePool.new(FPTA.address,FPTB.address,startTime);
         let minePool = await minePoolProxy.new(minePoolImpl.address,FPTA.address,FPTB.address,startTime);
-        let stateInst = await integratedState.new(FPTA.address,FPTB.address,managerA.address,managerB.address,minePool.address)
-        minePool.setOperator(2,stateInst.address)
-        return [minePool,stateInst]
+        let stakeInst = await integratedStake.new(FPTA.address,FPTB.address,managerA.address,managerB.address,minePool.address)
+        minePool.setOperator(2,stakeInst.address)
+        return [minePool,stakeInst]
     }
 })
 async function testViolation(message,testFunc){
