@@ -41,7 +41,7 @@ contract fixedMinePool is fixedMinePoolData {
     function initialize() initializer public {
         _owner = msg.sender;
         emit OwnershipTransferred(address(0), _owner);
-        _flexibleExpired = 15 days;
+        _flexibleExpired = 7 days;
     }
     /**
      * @dev setting function.
