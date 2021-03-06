@@ -565,7 +565,7 @@ contract fixedMinePool is fixedMinePoolData {
 
         require(userMaxPeriod>=userInfoMap[user].maxPeriodID, "lockedPeriod cannot be smaller than current locked period");
         if(userInfoMap[user].maxPeriodID<curPeriod && lockedPeriod == 1){
-            require(getPeriodFinishTime(getCurrentPeriodID()+lockedPeriod)>currentTime() + _flexibleExpired, 'locked time must greater than 15 days');
+            require(getPeriodFinishTime(getCurrentPeriodID()+lockedPeriod)>currentTime() + _flexibleExpired, 'locked time must greater than flexible expiration');
         }
         uint256 ftp_a_amount = IERC20(_FPTA).balanceOf(msg.sender);
         ftp_a_amount = getPayableAmount(_FPTA,ftp_a_amount);
