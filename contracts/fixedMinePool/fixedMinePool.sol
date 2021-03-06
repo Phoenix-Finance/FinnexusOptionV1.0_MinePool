@@ -269,7 +269,7 @@ contract fixedMinePool is fixedMinePoolData {
         }
         uint256 i = _maxPeriod-1;
         uint256 nowIndex = getPeriodIndex(currentTime());
-        uint64[] memory periodLocked = new uint64[](_maxPeriod);
+        uint256[] memory periodLocked = new uint256[](_maxPeriod);
         for (;;i--){
             periodLocked[i] = weightDistributionMap[nowIndex+i];
             for(uint256 j=i+1;j<_maxPeriod;j++){
@@ -279,7 +279,7 @@ contract fixedMinePool is fixedMinePoolData {
             }
             periodLocked[i] = periodLocked[i]*1000/(getPeriodWeight(nowIndex,nowIndex)-1000);
         }
-        uint256 allLockedPeriod;
+        uint256 allLockedPeriod = 0;
         for(i=0;i<_maxPeriod;i++){
             allLockedPeriod = allLockedPeriod.add(periodLocked[i].mul(getPeriodFinishTime(nowIndex+i).sub(currentTime())));
         }
