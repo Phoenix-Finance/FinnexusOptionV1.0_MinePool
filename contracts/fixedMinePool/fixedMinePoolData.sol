@@ -22,12 +22,12 @@ contract fixedMinePoolData is initializable,Operator,Halt,AddressWhiteList,Reent
     //The timestamp when the minepool begin.
     uint256 internal _startTime;
     //Single locked period duration.
-    uint256 internal constant _period = 90 days;
+    uint256 internal constant _period = 30 days;
     //The lock duration when user stake flexible FPT-B in this pool.
     uint256 internal _flexibleExpired;
 
     //The max locked peroid when user stake locked FPT-B coin.
-    uint256 constant internal _maxPeriod = 12;
+    uint256 constant internal _maxPeriod = 3;
     //The max loop when user does nothing to this pool for long long time .
     uint256 constant internal _maxLoop = 120;
     //the mine distribution's ratio to FPT-A coin 
