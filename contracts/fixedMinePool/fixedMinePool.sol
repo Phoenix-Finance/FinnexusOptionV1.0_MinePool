@@ -278,6 +278,9 @@ contract fixedMinePool is fixedMinePoolData {
                 }
             }
             periodLocked[i] = periodLocked[i]*1000/(getPeriodWeight(nowIndex,nowIndex)-1000);
+            if (i == 0){
+                break;
+            }
         }
         uint256 allLockedPeriod = 0;
         for(i=0;i<_maxPeriod;i++){
