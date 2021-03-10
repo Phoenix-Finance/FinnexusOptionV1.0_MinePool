@@ -43,6 +43,12 @@ contract fixedMinePool is fixedMinePoolData {
         emit OwnershipTransferred(address(0), _owner);
         _flexibleExpired = 7 days;
     }
+    function getFlexibleExpired()public view returns(uint256){
+        return _flexibleExpired;
+    }
+    function setFlexibleExpired(uint256 expired)public onlyOwner{
+        _flexibleExpired = expired;
+    }
     /**
      * @dev setting function.
      * @param FPTA FPT-A coin's address,staking coin
@@ -604,7 +610,7 @@ contract fixedMinePool is fixedMinePoolData {
         uint256 userMaxPeriod = curPeriod+lockedPeriod-1;
         require(userMaxPeriod>=userInfoMap[msg.sender].maxPeriodID, "lockedPeriod cannot be smaller than current locked period");
         if(userInfoMap[msg.sender].maxPeriodID<curPeriod && lockedPeriod == 1){
-            require(getPeriodFinishTime(getCurrentPeriodID()+lockedPeriod)>currentTime() + _flexibleExpired, 'locked time must greater than 15 days');
+            require(getPeriodFinishTime(getCurrentPeriodID()+lockedPeriod)>currentTime() + _flexibleExpired, 'locked time must greater than flexible days');
         }
         amount = getPayableAmount(_FPTB,amount);
         require(amount > 0, 'stake amount is zero');
