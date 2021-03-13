@@ -569,7 +569,7 @@ contract fixedMinePool is fixedMinePoolData {
 
         require(userMaxPeriod>=userInfoMap[user].maxPeriodID, "lockedPeriod cannot be smaller than current locked period");
         if(userInfoMap[user].maxPeriodID<curPeriod && lockedPeriod == 1){
-            require(getPeriodFinishTime(getCurrentPeriodID()+lockedPeriod)>currentTime() + _flexibleExpired, 'locked time must greater than 15 days');
+            require(getPeriodFinishTime(userMaxPeriod)>currentTime() + _flexibleExpired, 'locked time must greater than 15 days');
         }
         uint256 ftp_a_amount = IERC20(_FPTA).balanceOf(msg.sender);
         ftp_a_amount = getPayableAmount(_FPTA,ftp_a_amount);
@@ -605,7 +605,7 @@ contract fixedMinePool is fixedMinePoolData {
         uint256 userMaxPeriod = curPeriod+lockedPeriod-1;
         require(userMaxPeriod>=userInfoMap[msg.sender].maxPeriodID, "lockedPeriod cannot be smaller than current locked period");
         if(userInfoMap[msg.sender].maxPeriodID<curPeriod && lockedPeriod == 1){
-            require(getPeriodFinishTime(getCurrentPeriodID()+lockedPeriod)>currentTime() + _flexibleExpired, 'locked time must greater than 15 days');
+            require(getPeriodFinishTime(userMaxPeriod)>currentTime() + _flexibleExpired, 'locked time must greater than 15 days');
         }
         amount = getPayableAmount(_FPTB,amount);
         require(amount > 0, 'stake amount is zero');
