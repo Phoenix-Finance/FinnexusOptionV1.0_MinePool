@@ -43,6 +43,12 @@ contract fixedMinePool is fixedMinePoolData {
         emit OwnershipTransferred(address(0), _owner);
         _flexibleExpired = 15 days;
     }
+    function getFlexibleExpired()public view returns(uint256){
+        return _flexibleExpired;
+    }
+    function setFlexibleExpired(uint256 expired)public onlyOwner{
+        _flexibleExpired = expired;
+    }
     /**
      * @dev setting function.
      * @param FPTA FPT-A coin's address,staking coin
